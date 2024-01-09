@@ -26,3 +26,6 @@
 
 # logs
 /logs/
+
+# nebula configs
+nebula-account.yaml
