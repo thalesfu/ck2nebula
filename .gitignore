@@ -18,4 +18,11 @@
 # vendor/
 
 # Go workspace file
-go.work
+/go.work
+/go.sum
+
+# jetbrain
+/.idea/
+
+# logs
+/logs
