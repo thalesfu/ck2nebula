@@ -2,7 +2,10 @@ module github.com/thalesfu/ck2nebula
 
 go 1.19
 
-require github.com/thalesfu/nebulagolang v0.0.0-20240108145007-c093dd041ca6
+require (
+	github.com/thalesfu/nebulagolang v0.0.0-20240108145007-c093dd041ca6
+	github.com/thalesfu/paradoxtools v0.0.0-00010101000000-000000000000
+)
 
 require (
 	github.com/samber/lo v1.39.0 // indirect
