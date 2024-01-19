@@ -92,15 +92,15 @@ func DeleteAllReligionGroupWithEdges(space *nebulagolang.Space) *nebulagolang.Re
 }
 
 func InsertReligionGroups(space *nebulagolang.Space, cgs ...*ReligionGroup) *nebulagolang.Result {
-	return nebulagolang.BatchInsertVertexes(space, 10000, cgs)
+	return nebulagolang.BatchInsertVertexes(space, 250, cgs)
 }
 
 func UpdateReligionGroups(space *nebulagolang.Space, cgs ...*ReligionGroup) *nebulagolang.Result {
-	return nebulagolang.BatchUpdateVertexes(space, 5000, cgs)
+	return nebulagolang.BatchUpdateVertexes(space, 250, cgs)
 }
 
 func UpsertReligionGroups(space *nebulagolang.Space, cgs ...*ReligionGroup) *nebulagolang.Result {
-	return nebulagolang.BatchUpsertVertexes(space, 5000, cgs)
+	return nebulagolang.BatchUpsertVertexes(space, 250, cgs)
 }
 
 func GetReligionGroupByVid(space *nebulagolang.Space, vid string) *nebulagolang.ResultT[*ReligionGroup] {

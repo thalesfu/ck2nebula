@@ -55,15 +55,15 @@ func (r *Religion) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Resul
 }
 
 func InsertReligions(space *nebulagolang.Space, cs ...*Religion) *nebulagolang.Result {
-	return nebulagolang.BatchInsertVertexes(space, 10000, cs)
+	return nebulagolang.BatchInsertVertexes(space, 250, cs)
 }
 
 func UpdateReligions(space *nebulagolang.Space, cs ...*Religion) *nebulagolang.Result {
-	return nebulagolang.BatchUpdateVertexes(space, 5000, cs)
+	return nebulagolang.BatchUpdateVertexes(space, 250, cs)
 }
 
 func UpsertReligions(space *nebulagolang.Space, cs ...*Religion) *nebulagolang.Result {
-	return nebulagolang.BatchUpsertVertexes(space, 5000, cs)
+	return nebulagolang.BatchUpsertVertexes(space, 250, cs)
 }
 
 func DeleteReligions(space *nebulagolang.Space, codes ...string) *nebulagolang.Result {

@@ -4,13 +4,17 @@ import (
 	"github.com/thalesfu/paradoxtools/CK2/save"
 )
 
-func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle, []*Title_BaseTitle, []*Title_DejureLiegeTitle, []*Title_AssimilatingLiegeTitle) {
+func GetTitlesFromFile(path string, savePath string) ([]*Title, []*Title_BaseTitle, []*Title_LiegeTitle, []*Title_DejureLiegeTitle, []*Title_AssimilatingLiegeTitle) {
 	titles, ok := save.LoadTitles(path, savePath)
 
 	if !ok {
 		return nil, nil, nil, nil, nil
 	}
 
+	return GenerateTitles(titles)
+}
+
+func GenerateTitles(titles map[string]*save.Title) ([]*Title, []*Title_BaseTitle, []*Title_LiegeTitle, []*Title_DejureLiegeTitle, []*Title_AssimilatingLiegeTitle) {
 	rts := make([]*Title, len(titles))
 	rtlts := make([]*Title_LiegeTitle, 0)
 	rtbts := make([]*Title_BaseTitle, 0)
@@ -20,9 +24,6 @@ func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle
 	i := 0
 	for _, title := range titles {
 		rts[i] = NewTitleByData(title)
-		if title.IsDynamic {
-			rts[i].IsDynamic = true
-		}
 
 		if title.Liege != nil {
 			if title.Liege.ID == "" && title.Liege.Title != "" {
@@ -30,7 +31,6 @@ func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle
 			}
 			tlt := NewTitle_LiegeTitle(rts[i], NewTitleByData(title.Liege))
 			tlt.PlayID = title.PlayID
-			tlt.PlayDate = title.PlayDate
 			rtlts = append(rtlts, tlt)
 		}
 
@@ -40,7 +40,6 @@ func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle
 			}
 			tbt := NewTitle_BaseTitle(rts[i], NewTitleByData(title.BaseTitle))
 			tbt.PlayID = title.PlayID
-			tbt.PlayDate = title.PlayDate
 			rtbts = append(rtbts, tbt)
 		}
 
@@ -50,7 +49,6 @@ func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle
 			}
 			tdlt := NewTitle_DejureLiegeTitle(rts[i], NewTitleByData(title.DeJureLiege))
 			tdlt.PlayID = title.PlayID
-			tdlt.PlayDate = title.PlayDate
 			rtdlts = append(rtdlts, tdlt)
 		}
 
@@ -61,12 +59,11 @@ func GenerateTitles(path string, savePath string) ([]*Title, []*Title_LiegeTitle
 			talt := NewTitle_AssimilatingLiegeTitle(rts[i], NewTitleByData(title.AssimilatingLiege))
 			talt.DeJureAssYears = title.DeJureAssYears
 			talt.PlayID = title.PlayID
-			talt.PlayDate = title.PlayDate
 			rtalts = append(rtalts, talt)
 		}
 
 		i++
 	}
 
-	return rts, rtlts, rtbts, rtdlts, rtalts
+	return rts, rtbts, rtlts, rtdlts, rtalts
 }

@@ -92,15 +92,15 @@ func DeleteAllCultureGroupWithEdges(space *nebulagolang.Space) *nebulagolang.Res
 }
 
 func InsertCultureGroups(space *nebulagolang.Space, cgs ...*CultureGroup) *nebulagolang.Result {
-	return nebulagolang.BatchInsertVertexes(space, 10000, cgs)
+	return nebulagolang.BatchInsertVertexes(space, 250, cgs)
 }
 
 func UpdateCultureGroups(space *nebulagolang.Space, cgs ...*CultureGroup) *nebulagolang.Result {
-	return nebulagolang.BatchUpdateVertexes(space, 5000, cgs)
+	return nebulagolang.BatchUpdateVertexes(space, 250, cgs)
 }
 
 func UpsertCultureGroups(space *nebulagolang.Space, cgs ...*CultureGroup) *nebulagolang.Result {
-	return nebulagolang.BatchUpsertVertexes(space, 5000, cgs)
+	return nebulagolang.BatchUpsertVertexes(space, 250, cgs)
 }
 
 func GetCultureGroupByVid(space *nebulagolang.Space, vid string) *nebulagolang.ResultT[*CultureGroup] {

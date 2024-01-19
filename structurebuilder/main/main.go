@@ -18,6 +18,9 @@ func main() {
 	//build.RebuildTagWithIndexes[ck2nebula.Title](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.Title_LiegeTitle](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.Title_BaseTitle](ck2nebula.SPACE)
-	build.RebuildEdgeWithIndexes[ck2nebula.Title_DejureLiegeTitle](ck2nebula.SPACE)
-	build.RebuildEdgeWithIndexes[ck2nebula.Title_AssimilatingLiegeTitle](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Title_DejureLiegeTitle](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Title_AssimilatingLiegeTitle](ck2nebula.SPACE)
+
+	build.RebuildTagWithIndexes[ck2nebula.Story](ck2nebula.SPACE)
+	build.RebuildEdgeWithIndexes[ck2nebula.Story_Title](ck2nebula.SPACE)
 }

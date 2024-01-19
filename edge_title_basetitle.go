@@ -2,14 +2,12 @@ package ck2nebula
 
 import (
 	"github.com/thalesfu/nebulagolang"
-	"time"
 )
 
 type Title_BaseTitle struct {
-	Title     *Title    `nebulaedgename:"title_basetitle" nebulaedgecomment:"Title -> Base Title" nebulakey:"edgefrom" json:"from,omitempty"`
-	BaseTitle *Title    `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID    int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
-	PlayDate  time.Time `nebulaproperty:"play_date" nebulatype:"Date" description:"game play date" nebulaindexes:"play_date" json:"play_date,omitempty"`
+	Title     *Title `nebulaedgename:"title_basetitle" nebulaedgecomment:"Title -> Base Title" nebulakey:"edgefrom" json:"from,omitempty"`
+	BaseTitle *Title `nebulakey:"edgeto" json:"to,omitempty"`
+	PlayID    int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
 }
 
 func NewTitle_BaseTitle(t *Title, bt *Title) *Title_BaseTitle {
@@ -40,15 +38,15 @@ func (tbt *Title_BaseTitle) LoadFromNebula(space *nebulagolang.Space) *nebulagol
 }
 
 func InsertTitle_BaseTitles(space *nebulagolang.Space, tbts ...*Title_BaseTitle) *nebulagolang.Result {
-	return nebulagolang.BatchInsertEdges(space, 10000, tbts)
+	return nebulagolang.BatchInsertEdges(space, 250, tbts)
 }
 
 func UpdateTitle_BaseTitles(space *nebulagolang.Space, tbts ...*Title_BaseTitle) *nebulagolang.Result {
-	return nebulagolang.BatchUpdateEdges(space, 5000, tbts)
+	return nebulagolang.BatchUpdateEdges(space, 250, tbts)
 }
 
 func UpsertTitle_BaseTitles(space *nebulagolang.Space, tbts ...*Title_BaseTitle) *nebulagolang.Result {
-	return nebulagolang.BatchUpsertEdges(space, 5000, tbts)
+	return nebulagolang.BatchUpsertEdges(space, 250, tbts)
 }
 
 func DeleteTitle_BaseTitles(space *nebulagolang.Space, tbts ...*Title_BaseTitle) *nebulagolang.Result {
@@ -57,6 +55,10 @@ func DeleteTitle_BaseTitles(space *nebulagolang.Space, tbts ...*Title_BaseTitle)
 
 func DeleteAllTitle_BaseTitles(space *nebulagolang.Space) *nebulagolang.Result {
 	return nebulagolang.DeleteAllEdgesByEdgeType[Title_BaseTitle](space)
+}
+
+func DeleteAllTitle_BaseTitlesByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.Result {
+	return nebulagolang.DeleteAllEdgesByQuery[Title_BaseTitle](space, getPlayIdQuery[Title_BaseTitle](playId))
 }
 
 func GetTitle_BaseTitleByEid(space *nebulagolang.Space, eid *nebulagolang.EID) *nebulagolang.ResultT[*Title_BaseTitle] {
@@ -71,6 +73,14 @@ func GetAllTitle_BaseTitlesEids(space *nebulagolang.Space) *nebulagolang.ResultT
 	return nebulagolang.GetAllEdgesEIDsByQuery[*Title_BaseTitle](space, "")
 }
 
+func GetAllTitle_BaseTitlesEidsByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.ResultT[map[string]bool] {
+	return nebulagolang.GetAllEdgesEIDsByQuery[*Title_BaseTitle](space, getPlayIdQuery[Title_BaseTitle](playId))
+}
+
 func GetAllTitle_BaseTitles(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Title_BaseTitle] {
 	return nebulagolang.GetAllEdgesByEdgeType[*Title_BaseTitle](space)
+}
+
+func GetAllTitle_BaseTitlesByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.ResultT[map[string]*Title_BaseTitle] {
+	return nebulagolang.GetAllEdgesByQuery[*Title_BaseTitle](space, getPlayIdQuery[Title_BaseTitle](playId))
 }

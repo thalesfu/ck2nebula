@@ -66,15 +66,15 @@ func (c *Culture) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Result
 }
 
 func InsertCultures(space *nebulagolang.Space, cs ...*Culture) *nebulagolang.Result {
-	return nebulagolang.BatchInsertVertexes(space, 10000, cs)
+	return nebulagolang.BatchInsertVertexes(space, 250, cs)
 }
 
 func UpdateCultures(space *nebulagolang.Space, cs ...*Culture) *nebulagolang.Result {
-	return nebulagolang.BatchUpdateVertexes(space, 5000, cs)
+	return nebulagolang.BatchUpdateVertexes(space, 250, cs)
 }
 
 func UpsertCultures(space *nebulagolang.Space, cs ...*Culture) *nebulagolang.Result {
-	return nebulagolang.BatchUpsertVertexes(space, 5000, cs)
+	return nebulagolang.BatchUpsertVertexes(space, 250, cs)
 }
 
 func DeleteCultures(space *nebulagolang.Space, codes ...string) *nebulagolang.Result {
