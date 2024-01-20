@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/thalesfu/ck2nebula"
+	"github.com/thalesfu/paradoxtools/utils"
 )
 
 const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
@@ -150,8 +151,6 @@ func main() {
 	//	fmt.Println("Delete story data success")
 	//}
 
-	story, result := ck2nebula.LoadAndUpdateStory(ck2Folder, saveFile2)
-
 	//
 	//resultT = ck2nebula.DeleteAllTitle_BaseTitles(ck2nebula.SPACE)
 	//resultT = ck2nebula.DeleteAllTitle_LiegeTitles(ck2nebula.SPACE)
@@ -160,38 +159,10 @@ func main() {
 	//sid, _ := strconv.Atoi(s.Story.PlayID)
 	//resultT := ck2nebula.GetStoryByID(ck2nebula.SPACE, sid)
 
-	if !result.Ok {
-		fmt.Println(result.Err)
-	} else {
-		fmt.Println("Story added:", len(story.Story.Added))
-		fmt.Println("Story updated:", len(story.Story.Updated))
-		fmt.Println("Story deleted:", len(story.Story.Deleted))
-		fmt.Println("Story kept:", len(story.Story.Kept))
-		fmt.Println("Title added:", len(story.Titles.Added))
-		fmt.Println("Title updated:", len(story.Titles.Updated))
-		fmt.Println("Title deleted:", len(story.Titles.Deleted))
-		fmt.Println("Title kept:", len(story.Titles.Kept))
-		fmt.Println("Title_BaseTitle added:", len(story.Title_BaseTitles.Added))
-		fmt.Println("Title_BaseTitle updated:", len(story.Title_BaseTitles.Updated))
-		fmt.Println("Title_BaseTitle deleted:", len(story.Title_BaseTitles.Deleted))
-		fmt.Println("Title_BaseTitle kept:", len(story.Title_BaseTitles.Kept))
-		fmt.Println("Title_LiegeTitle added:", len(story.Title_LiegeTitles.Added))
-		fmt.Println("Title_LiegeTitle updated:", len(story.Title_LiegeTitles.Updated))
-		fmt.Println("Title_LiegeTitle deleted:", len(story.Title_LiegeTitles.Deleted))
-		fmt.Println("Title_LiegeTitle kept:", len(story.Title_LiegeTitles.Kept))
-		fmt.Println("Title_DejureLiegeTitle added:", len(story.Title_DejureLiegeTitles.Added))
-		fmt.Println("Title_DejureLiegeTitle updated:", len(story.Title_DejureLiegeTitles.Updated))
-		fmt.Println("Title_DejureLiegeTitle deleted:", len(story.Title_DejureLiegeTitles.Deleted))
-		fmt.Println("Title_DejureLiegeTitle kept:", len(story.Title_DejureLiegeTitles.Kept))
-		fmt.Println("Title_AssimilatingLiegeTitle added:", len(story.Title_AssimilatingLiegeTitles.Added))
-		fmt.Println("Title_AssimilatingLiegeTitle updated:", len(story.Title_AssimilatingLiegeTitles.Updated))
-		fmt.Println("Title_AssimilatingLiegeTitle deleted:", len(story.Title_AssimilatingLiegeTitles.Deleted))
-		fmt.Println("Title_AssimilatingLiegeTitle kept:", len(story.Title_AssimilatingLiegeTitles.Kept))
-		fmt.Println("Story_Title added:", len(story.Story_Titles.Added))
-		fmt.Println("Story_Title updated:", len(story.Story_Titles.Updated))
-		fmt.Println("Story_Title deleted:", len(story.Story_Titles.Deleted))
-		fmt.Println("Story_Title kept:", len(story.Story_Titles.Kept))
+	//ck2nebula.BuildStory(ck2Folder, saveFile)
 
-	}
+	//ck2nebula.BuildModifiers(ck2Folder)
+
+	fmt.Println(utils.MarshalJSON(ck2nebula.GetModifierByCode(ck2nebula.SPACE, "peg_leg").Data))
 
 }

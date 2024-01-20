@@ -155,6 +155,44 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 	return result, ustr
 }
 
+func BuildStory(path string, savePath string) {
+	story, result := LoadAndUpdateStory(path, savePath)
+
+	if !result.Ok {
+		fmt.Println(result.Err)
+	} else {
+		fmt.Println("Story added:", len(story.Story.Added))
+		fmt.Println("Story updated:", len(story.Story.Updated))
+		fmt.Println("Story deleted:", len(story.Story.Deleted))
+		fmt.Println("Story kept:", len(story.Story.Kept))
+		fmt.Println("Title added:", len(story.Titles.Added))
+		fmt.Println("Title updated:", len(story.Titles.Updated))
+		fmt.Println("Title deleted:", len(story.Titles.Deleted))
+		fmt.Println("Title kept:", len(story.Titles.Kept))
+		fmt.Println("Title_BaseTitle added:", len(story.Title_BaseTitles.Added))
+		fmt.Println("Title_BaseTitle updated:", len(story.Title_BaseTitles.Updated))
+		fmt.Println("Title_BaseTitle deleted:", len(story.Title_BaseTitles.Deleted))
+		fmt.Println("Title_BaseTitle kept:", len(story.Title_BaseTitles.Kept))
+		fmt.Println("Title_LiegeTitle added:", len(story.Title_LiegeTitles.Added))
+		fmt.Println("Title_LiegeTitle updated:", len(story.Title_LiegeTitles.Updated))
+		fmt.Println("Title_LiegeTitle deleted:", len(story.Title_LiegeTitles.Deleted))
+		fmt.Println("Title_LiegeTitle kept:", len(story.Title_LiegeTitles.Kept))
+		fmt.Println("Title_DejureLiegeTitle added:", len(story.Title_DejureLiegeTitles.Added))
+		fmt.Println("Title_DejureLiegeTitle updated:", len(story.Title_DejureLiegeTitles.Updated))
+		fmt.Println("Title_DejureLiegeTitle deleted:", len(story.Title_DejureLiegeTitles.Deleted))
+		fmt.Println("Title_DejureLiegeTitle kept:", len(story.Title_DejureLiegeTitles.Kept))
+		fmt.Println("Title_AssimilatingLiegeTitle added:", len(story.Title_AssimilatingLiegeTitles.Added))
+		fmt.Println("Title_AssimilatingLiegeTitle updated:", len(story.Title_AssimilatingLiegeTitles.Updated))
+		fmt.Println("Title_AssimilatingLiegeTitle deleted:", len(story.Title_AssimilatingLiegeTitles.Deleted))
+		fmt.Println("Title_AssimilatingLiegeTitle kept:", len(story.Title_AssimilatingLiegeTitles.Kept))
+		fmt.Println("Story_Title added:", len(story.Story_Titles.Added))
+		fmt.Println("Story_Title updated:", len(story.Story_Titles.Updated))
+		fmt.Println("Story_Title deleted:", len(story.Story_Titles.Deleted))
+		fmt.Println("Story_Title kept:", len(story.Story_Titles.Kept))
+
+	}
+}
+
 func DeleteStoryData(playId int) *nebulagolang.Result {
 	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
 
