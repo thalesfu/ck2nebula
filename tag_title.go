@@ -133,6 +133,10 @@ func GetAllTitleByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.Re
 	return nebulagolang.GetAllVertexesByQuery[*Title](space, getPlayIdQuery[Title](playId))
 }
 
+func GetAllTitlesByPlayIdAndName(space *nebulagolang.Space, playId int, name string) *nebulagolang.ResultT[map[string]*Title] {
+	return nebulagolang.GetAllVertexesByQuery[*Title](space, getPlayIdAndPropertyQuery[Title](playId, "name", name))
+}
+
 func GetAllTitleVids(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]bool] {
 	return nebulagolang.GetAllVertexesVIDsByQuery[*Title](space, "")
 }

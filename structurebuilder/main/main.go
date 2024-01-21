@@ -24,5 +24,12 @@ func main() {
 	//build.RebuildTagWithIndexes[ck2nebula.Story](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.Story_Title](ck2nebula.SPACE)
 
-	build.RebuildTagWithIndexes[ck2nebula.Modifier](ck2nebula.SPACE)
+	//build.RebuildTagWithIndexes[ck2nebula.Modifier](ck2nebula.SPACE)
+
+	//build.RebuildTagWithIndexes[ck2nebula.Province](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Story_Province](ck2nebula.SPACE)
+
+	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Modifier](ck2nebula.SPACE)
+	build.RebuildEdgeWithIndexes[ck2nebula.Province_Culture](ck2nebula.SPACE)
+	build.RebuildEdgeWithIndexes[ck2nebula.Province_Religion](ck2nebula.SPACE)
 }

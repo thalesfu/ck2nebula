@@ -8,17 +8,20 @@ import (
 )
 
 type Story struct {
-	VID        string    `nebulakey:"vid" nebulatagname:"story" nebulatagcomment:"story" json:"vid,omitempty"`
-	Version    string    `nebulaproperty:"version" description:"version" nebulaindexes:"version" json:"version,omitempty"`
-	PlayID     int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
-	PlayDate   time.Time `nebulaproperty:"play_date" nebulatype:"Date" description:"game play date" nebulaindexes:"play_date" json:"play_date,omitempty"`
-	PlayerID   int       `nebulaproperty:"player_id" description:"player id" nebulaindexes:"player id" json:"player_id,omitempty"`
-	PlayerName string    `nebulaproperty:"player_name" description:"player name" nebulaindexes:"player name" json:"player_name,omitempty"`
-	PlayerAge  int       `nebulaproperty:"player_age" description:"player age" nebulaindexes:"player age" json:"player_age,omitempty"`
-	Religion   string    `nebulaproperty:"religion" description:"religion" nebulaindexes:"religion" json:"religion,omitempty"`
-	Culture    string    `nebulaproperty:"culture" description:"culture" nebulaindexes:"culture" json:"culture,omitempty"`
-	Government string    `nebulaproperty:"government" description:"government" nebulaindexes:"government" json:"government,omitempty"`
-	Dynasty    string    `nebulaproperty:"dynasty" description:"dynasty" nebulaindexes:"dynasty" json:"dynasty,omitempty"`
+	VID            string    `nebulakey:"vid" nebulatagname:"story" nebulatagcomment:"story" json:"vid,omitempty"`
+	Version        string    `nebulaproperty:"version" description:"version" nebulaindexes:"version" json:"version,omitempty"`
+	PlayID         int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	PlayDate       time.Time `nebulaproperty:"play_date" nebulatype:"Date" description:"game play date" nebulaindexes:"play_date" json:"play_date,omitempty"`
+	PlayerID       int       `nebulaproperty:"player_id" description:"player id" nebulaindexes:"player id" json:"player_id,omitempty"`
+	PlayerName     string    `nebulaproperty:"player_name" description:"player name" nebulaindexes:"player name" json:"player_name,omitempty"`
+	PlayerAge      int       `nebulaproperty:"player_age" description:"player age" nebulaindexes:"player age" json:"player_age,omitempty"`
+	Religion       string    `nebulaproperty:"religion" description:"religion" nebulaindexes:"religion" json:"religion,omitempty"`
+	ReligionName   string    `nebulaproperty:"religion_name" description:"religion name" nebulaindexes:"religion_name" json:"religion_name,omitempty"`
+	Culture        string    `nebulaproperty:"culture" description:"culture" nebulaindexes:"culture" json:"culture,omitempty"`
+	CultureName    string    `nebulaproperty:"culture_name" description:"culture name" nebulaindexes:"culture_name" json:"culture_name,omitempty"`
+	Government     string    `nebulaproperty:"government" description:"government" nebulaindexes:"government" json:"government,omitempty"`
+	GovernmentName string    `nebulaproperty:"government_name" description:"government name" nebulaindexes:"government_name" json:"government_name,omitempty"`
+	Dynasty        string    `nebulaproperty:"dynasty" description:"dynasty" nebulaindexes:"dynasty" json:"dynasty,omitempty"`
 }
 
 func NewStory(id int) *Story {
