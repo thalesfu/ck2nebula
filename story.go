@@ -16,6 +16,7 @@ type StoryDetail struct {
 	Title_LiegeTitles             []*Title_LiegeTitle
 	Title_DejureLiegeTitles       []*Title_DejureLiegeTitle
 	Title_AssimilatingLiegeTitles []*Title_AssimilatingLiegeTitle
+	Title_Dynasties               []*Title_Dynasty
 	Story_Titles                  []*Story_Title
 	Provinces                     []*Province
 	Story_Provinces               []*Story_Province
@@ -41,6 +42,7 @@ type StoryUpdateDetail struct {
 	Title_LiegeTitles             *nebulagolang.CompareResult[*Title_LiegeTitle]
 	Title_DejureLiegeTitles       *nebulagolang.CompareResult[*Title_DejureLiegeTitle]
 	Title_AssimilatingLiegeTitles *nebulagolang.CompareResult[*Title_AssimilatingLiegeTitle]
+	Title_Dynasties               *nebulagolang.CompareResult[*Title_Dynasty]
 	Story_Titles                  *nebulagolang.CompareResult[*Story_Title]
 	Provinces                     *nebulagolang.CompareResult[*Province]
 	Story_Provinces               *nebulagolang.CompareResult[*Story_Province]
@@ -91,7 +93,7 @@ func GetStory(path string, savePath string) *StoryDetail {
 
 func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[string]string) *StoryDetail {
 
-	titles, baseTitles, liegeTitles, dejureLiegeTitles, assimilatingLiegeTitles := GenerateTitles(file.Titles)
+	titles, baseTitles, liegeTitles, dejureLiegeTitles, assimilatingLiegeTitles, title_dynasties := GenerateTitles(file.Titles)
 
 	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cm, rm)
 
@@ -104,6 +106,7 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		Title_LiegeTitles:             liegeTitles,
 		Title_DejureLiegeTitles:       dejureLiegeTitles,
 		Title_AssimilatingLiegeTitles: assimilatingLiegeTitles,
+		Title_Dynasties:               title_dynasties,
 		Story_Titles:                  make([]*Story_Title, 0),
 		Provinces:                     provinces,
 		Story_Provinces:               make([]*Story_Province, 0),
@@ -231,6 +234,14 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 	}
 
 	result.Title_AssimilatingLiegeTitles = ctaltr
+
+	utdr, ctdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.PlayID))
+
+	if !utdr.Ok {
+		return result, utdr
+	}
+
+	result.Title_Dynasties = ctdr
 
 	ustr, cstr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.PlayID))
 
@@ -393,6 +404,10 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("Title_AssimilatingLiegeTitle updated:", len(story.Title_AssimilatingLiegeTitles.Updated))
 		fmt.Println("Title_AssimilatingLiegeTitle deleted:", len(story.Title_AssimilatingLiegeTitles.Deleted))
 		fmt.Println("Title_AssimilatingLiegeTitle kept:", len(story.Title_AssimilatingLiegeTitles.Kept))
+		fmt.Println("Title_Dynasty added:", len(story.Title_Dynasties.Added))
+		fmt.Println("Title_Dynasty updated:", len(story.Title_Dynasties.Updated))
+		fmt.Println("Title_Dynasty deleted:", len(story.Title_Dynasties.Deleted))
+		fmt.Println("Title_Dynasty kept:", len(story.Title_Dynasties.Kept))
 		fmt.Println("Story_Title added:", len(story.Story_Titles.Added))
 		fmt.Println("Story_Title updated:", len(story.Story_Titles.Updated))
 		fmt.Println("Story_Title deleted:", len(story.Story_Titles.Deleted))
@@ -563,7 +578,19 @@ func DeleteStoryData(playId int) *nebulagolang.Result {
 		return r
 	}
 
+	r = DeleteAllTitle_DynastysByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
 	r = DeleteAllBaronByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllDynastyByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

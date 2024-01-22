@@ -4,22 +4,19 @@ import (
 	"github.com/thalesfu/paradoxtools/CK2/save"
 )
 
-func GetTitlesFromFile(path string, savePath string) ([]*Title, []*Title_BaseTitle, []*Title_LiegeTitle, []*Title_DejureLiegeTitle, []*Title_AssimilatingLiegeTitle) {
-	titles, ok := save.LoadTitles(path, savePath)
-
-	if !ok {
-		return nil, nil, nil, nil, nil
-	}
-
-	return GenerateTitles(titles)
-}
-
-func GenerateTitles(titles map[string]*save.Title) ([]*Title, []*Title_BaseTitle, []*Title_LiegeTitle, []*Title_DejureLiegeTitle, []*Title_AssimilatingLiegeTitle) {
+func GenerateTitles(titles map[string]*save.Title) (
+	[]*Title,
+	[]*Title_BaseTitle,
+	[]*Title_LiegeTitle,
+	[]*Title_DejureLiegeTitle,
+	[]*Title_AssimilatingLiegeTitle,
+	[]*Title_Dynasty) {
 	rts := make([]*Title, len(titles))
 	rtlts := make([]*Title_LiegeTitle, 0)
 	rtbts := make([]*Title_BaseTitle, 0)
 	rtdlts := make([]*Title_DejureLiegeTitle, 0)
 	rtalts := make([]*Title_AssimilatingLiegeTitle, 0)
+	rtds := make([]*Title_Dynasty, 0)
 
 	i := 0
 	for _, title := range titles {
@@ -62,8 +59,14 @@ func GenerateTitles(titles map[string]*save.Title) ([]*Title, []*Title_BaseTitle
 			rtalts = append(rtalts, talt)
 		}
 
+		if title.Dynasty != 0 {
+			td := NewTitle_Dynasty(rts[i], NewDynasty(title.PlayID, title.Dynasty))
+			td.PlayID = title.PlayID
+			rtds = append(rtds, td)
+		}
+
 		i++
 	}
 
-	return rts, rtbts, rtlts, rtdlts, rtalts
+	return rts, rtbts, rtlts, rtdlts, rtalts, rtds
 }

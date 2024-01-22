@@ -8,23 +8,25 @@ import (
 )
 
 type Title struct {
-	VID         string `nebulakey:"vid" nebulatagname:"title" nebulatagcomment:"title" json:"vid,omitempty"`
-	Name        string `nebulaproperty:"name" description:"title name" nebulaindexes:"name" json:"name,omitempty"`
-	ID          string `nebulaproperty:"id" description:"title code" nebulaindexes:"code" json:"code,omitempty"`
-	Foa         string `nebulaproperty:"foa" description:"title foa" nebulaindexes:"foa" son:"foa,omitempty"`
-	Title       string `nebulaproperty:"title" description:"title" nebulaindexes:"title" json:"title,omitempty"`
-	TitleFemale string `nebulaproperty:"title_female" description:"female title" nebulaindexes:"title_female" json:"title_female,omitempty"`
-	Gender      string `nebulaproperty:"gender" description:"title gender" nebulaindexes:"gender" json:"gender,omitempty"`
-	Active      bool   `nebulaproperty:"active" description:"title is active" nebulaindexes:"active" json:"active,omitempty"`
-	IsCustom    bool   `nebulaproperty:"is_custom" description:"is custom title" nebulaindexes:"is_custom" json:"is_custom,omitempty"`
-	IsDynamic   bool   `nebulaproperty:"is_dynamic" mappingalias:"Dynamic" description:"is dynamic title" nebulaindexes:"is_dynamic" json:"is_dynamic,omitempty"`
-	Nomad       bool   `nebulaproperty:"nomad" description:"title is nomad" nebulaindexes:"nomad" json:"nomad,omitempty"`
-	Landless    bool   `nebulaproperty:"landless" description:"title is land less" nebulaindexes:"landless" json:"landless,omitempty"`
-	MajorRevolt bool   `nebulaproperty:"major_revolt" description:"title is major revolt" nebulaindexes:"major_revolt" json:"major_revolt,omitempty"`
-	Mercenary   bool   `nebulaproperty:"mercenary" description:"title is mercenary" nebulaindexes:"mercenary" json:"mercenary,omitempty"`
-	Rebels      bool   `nebulaproperty:"rebels" description:"title is rebels" nebulaindexes:"rebels" json:"rebels,omitempty"`
-	Temporary   bool   `nebulaproperty:"temporary" description:"title is temporary" nebulaindexes:"temporary" json:"temporary,omitempty"`
-	PlayID      int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	VID                string `nebulakey:"vid" nebulatagname:"title" nebulatagcomment:"title" json:"vid,omitempty"`
+	Name               string `nebulaproperty:"name" description:"title name" nebulaindexes:"name" json:"name,omitempty"`
+	ID                 string `nebulaproperty:"id" description:"title code" nebulaindexes:"code" json:"code,omitempty"`
+	Foa                string `nebulaproperty:"foa" description:"title foa" nebulaindexes:"foa" son:"foa,omitempty"`
+	Title              string `nebulaproperty:"title" description:"title" nebulaindexes:"title" json:"title,omitempty"`
+	TitleFemale        string `nebulaproperty:"title_female" description:"female title" nebulaindexes:"title_female" json:"title_female,omitempty"`
+	Gender             string `nebulaproperty:"gender" description:"title gender" nebulaindexes:"gender" json:"gender,omitempty"`
+	Active             bool   `nebulaproperty:"active" description:"title is active" nebulaindexes:"active" json:"active,omitempty"`
+	IsCustom           bool   `nebulaproperty:"is_custom" description:"is custom title" nebulaindexes:"is_custom" json:"is_custom,omitempty"`
+	IsDynamic          bool   `nebulaproperty:"is_dynamic" mappingalias:"Dynamic" description:"is dynamic title" nebulaindexes:"is_dynamic" json:"is_dynamic,omitempty"`
+	Nomad              bool   `nebulaproperty:"nomad" description:"title is nomad" nebulaindexes:"nomad" json:"nomad,omitempty"`
+	Landless           bool   `nebulaproperty:"landless" description:"title is land less" nebulaindexes:"landless" json:"landless,omitempty"`
+	MajorRevolt        bool   `nebulaproperty:"major_revolt" description:"title is major revolt" nebulaindexes:"major_revolt" json:"major_revolt,omitempty"`
+	Mercenary          bool   `nebulaproperty:"mercenary" description:"title is mercenary" nebulaindexes:"mercenary" json:"mercenary,omitempty"`
+	Rebels             bool   `nebulaproperty:"rebels" description:"title is rebels" nebulaindexes:"rebels" json:"rebels,omitempty"`
+	Temporary          bool   `nebulaproperty:"temporary" description:"title is temporary" nebulaindexes:"temporary" json:"temporary,omitempty"`
+	CoatOfArmsData     string `nebulaproperty:"coat_of_arms_data" description:"coat_of_arms_data" nebulaindexes:"coat_of_arms_data" json:"coat_of_arms_data,omitempty"`
+	CoatOfArmsReligion string `nebulaproperty:"coat_of_arms_religion" description:"coat_of_arms_religion" nebulaindexes:"coat_of_arms_religion" json:"coat_of_arms_religion,omitempty"`
+	PlayID             int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
 
 	//Holder            int              `paradox_field:"holder" json:"holder,omitempty"`
 	//Dynasty           int
@@ -42,6 +44,19 @@ func NewTitle(playId int, titleId string) *Title {
 func NewTitleByData(title *save.Title) *Title {
 	nebulaTitle := utils.Mapping[Title](title)
 	nebulaTitle.VID = getTitleVid(nebulaTitle.PlayID, nebulaTitle.ID)
+
+	if title.CoatOfArms != nil {
+		if len(title.CoatOfArms.Data) > 0 {
+			for _, v := range title.CoatOfArms.Data {
+				nebulaTitle.CoatOfArmsData += fmt.Sprintf("%d ", v)
+			}
+
+			nebulaTitle.CoatOfArmsData = nebulaTitle.CoatOfArmsData[:len(nebulaTitle.CoatOfArmsData)-1]
+		}
+
+		nebulaTitle.CoatOfArmsReligion = title.CoatOfArms.Religion
+	}
+
 	return &nebulaTitle
 }
 
