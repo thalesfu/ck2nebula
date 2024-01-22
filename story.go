@@ -23,6 +23,11 @@ type StoryDetail struct {
 	Province_Cultures             []*Province_Culture
 	Province_Religions            []*Province_Religion
 	Province_Titles               []*Province_Title
+	Barons                        []*Baron
+	Province_Barons               []*Province_Baron
+	Baron_Buildings               []*Baron_Building
+	Baron_Titles                  []*Baron_Title
+	Story_Barons                  []*Story_Baron
 }
 
 type StoryUpdateDetail struct {
@@ -39,6 +44,11 @@ type StoryUpdateDetail struct {
 	Province_Cultures             *nebulagolang.CompareResult[*Province_Culture]
 	Province_Religions            *nebulagolang.CompareResult[*Province_Religion]
 	Province_Titles               *nebulagolang.CompareResult[*Province_Title]
+	Barons                        *nebulagolang.CompareResult[*Baron]
+	Province_Barons               *nebulagolang.CompareResult[*Province_Baron]
+	Baron_Buildings               *nebulagolang.CompareResult[*Baron_Building]
+	Baron_Titles                  *nebulagolang.CompareResult[*Baron_Title]
+	Story_Barons                  *nebulagolang.CompareResult[*Story_Baron]
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
@@ -75,7 +85,7 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 
 	titles, baseTitles, liegeTitles, dejureLiegeTitles, assimilatingLiegeTitles := GenerateTitles(file.Titles)
 
-	provinces, province_modifiers, province_cultures, province_religions, province_titles := GenerateProvinces(file.Provinces, cm, rm)
+	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cm, rm)
 
 	sd := &StoryDetail{
 		Story:                         NewStoryByData(file),
@@ -91,6 +101,11 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		Province_Cultures:             province_cultures,
 		Province_Religions:            province_religions,
 		Province_Titles:               province_titles,
+		Barons:                        barons,
+		Province_Barons:               province_barons,
+		Baron_Buildings:               baron_buildings,
+		Baron_Titles:                  baron_titles,
+		Story_Barons:                  make([]*Story_Baron, 0),
 	}
 
 	sd.Story.CultureName = cm[sd.Story.Culture]
@@ -102,6 +117,10 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 
 	for _, province := range provinces {
 		sd.Story_Provinces = append(sd.Story_Provinces, NewStory_Province(sd.Story, province))
+	}
+
+	for _, baron := range barons {
+		sd.Story_Barons = append(sd.Story_Barons, NewStory_Baron(sd.Story, baron))
 	}
 
 	return sd
@@ -251,6 +270,46 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Titles = cptr
 
+	ubr, cbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Barons, getPlayIdQuery[Baron](s.Story.PlayID))
+
+	if !ubr.Ok {
+		return result, ubr
+	}
+
+	result.Barons = cbr
+
+	upbr, cpbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.PlayID))
+
+	if !upbr.Ok {
+		return result, upbr
+	}
+
+	result.Province_Barons = cpbr
+
+	ubbr, cbbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.PlayID))
+
+	if !ubbr.Ok {
+		return result, ubbr
+	}
+
+	result.Baron_Buildings = cbbr
+
+	ubtr, cbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.PlayID))
+
+	if !ubtr.Ok {
+		return result, ubtr
+	}
+
+	result.Baron_Titles = cbtr
+
+	usb, csb := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.PlayID))
+
+	if !usb.Ok {
+		return result, usb
+	}
+
+	result.Story_Barons = csb
+
 	return result, ustr
 }
 
@@ -312,11 +371,55 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("Province_Title updated:", len(story.Province_Titles.Updated))
 		fmt.Println("Province_Title deleted:", len(story.Province_Titles.Deleted))
 		fmt.Println("Province_Title kept:", len(story.Province_Titles.Kept))
+		fmt.Println("Baron added:", len(story.Barons.Added))
+		fmt.Println("Baron updated:", len(story.Barons.Updated))
+		fmt.Println("Baron deleted:", len(story.Barons.Deleted))
+		fmt.Println("Baron kept:", len(story.Barons.Kept))
+		fmt.Println("Province_Baron added:", len(story.Province_Barons.Added))
+		fmt.Println("Province_Baron updated:", len(story.Province_Barons.Updated))
+		fmt.Println("Province_Baron deleted:", len(story.Province_Barons.Deleted))
+		fmt.Println("Province_Baron kept:", len(story.Province_Barons.Kept))
+		fmt.Println("Baron_Building added:", len(story.Baron_Buildings.Added))
+		fmt.Println("Baron_Building updated:", len(story.Baron_Buildings.Updated))
+		fmt.Println("Baron_Building deleted:", len(story.Baron_Buildings.Deleted))
+		fmt.Println("Baron_Building kept:", len(story.Baron_Buildings.Kept))
+		fmt.Println("Baron_Title added:", len(story.Baron_Titles.Added))
+		fmt.Println("Baron_Title updated:", len(story.Baron_Titles.Updated))
+		fmt.Println("Baron_Title deleted:", len(story.Baron_Titles.Deleted))
+		fmt.Println("Baron_Title kept:", len(story.Baron_Titles.Kept))
+		fmt.Println("Story_Baron added:", len(story.Story_Barons.Added))
+		fmt.Println("Story_Baron updated:", len(story.Story_Barons.Updated))
+		fmt.Println("Story_Baron deleted:", len(story.Story_Barons.Deleted))
+		fmt.Println("Story_Baron kept:", len(story.Story_Barons.Kept))
 	}
 }
 
 func DeleteStoryData(playId int) *nebulagolang.Result {
 	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllStory_BaronsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllBaron_BuildingsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllBaron_TitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllProvince_BaronsByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r
@@ -377,6 +480,12 @@ func DeleteStoryData(playId int) *nebulagolang.Result {
 	}
 
 	r = DeleteAllTitleByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllBaronByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

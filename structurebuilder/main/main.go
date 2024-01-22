@@ -32,7 +32,13 @@ func main() {
 	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Modifier](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Culture](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Religion](ck2nebula.SPACE)
-	build.RebuildEdgeWithIndexes[ck2nebula.Province_Title](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Title](ck2nebula.SPACE)
 
 	//build.RebuildTagWithIndexes[ck2nebula.Building](ck2nebula.SPACE)
+
+	build.RebuildTagWithIndexes[ck2nebula.Baron](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Baron_Title](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Baron_Building](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Province_Baron](ck2nebula.SPACE)
+	//build.RebuildEdgeWithIndexes[ck2nebula.Story_Baron](ck2nebula.SPACE)
 }

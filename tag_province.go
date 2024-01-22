@@ -216,3 +216,11 @@ func GetAllProvincesNames(space *nebulagolang.Space) *nebulagolang.ResultT[map[s
 func GetAllProvinceNamesByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.ResultT[map[string]bool] {
 	return nebulagolang.GetAllVertexesPropertyByQuery[*Province](space, getPlayIdQuery[Province](playId), "name", "")
 }
+
+func GetAllProvincesCodes(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]bool] {
+	return nebulagolang.GetAllVertexesPropertyByQuery[*Province](space, "", "code", "")
+}
+
+func GetAllProvinceCodesByPlayId(space *nebulagolang.Space, playId int) *nebulagolang.ResultT[map[string]bool] {
+	return nebulagolang.GetAllVertexesPropertyByQuery[*Province](space, getPlayIdQuery[Province](playId), "code", "")
+}
