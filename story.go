@@ -28,6 +28,10 @@ type StoryDetail struct {
 	Baron_Buildings               []*Baron_Building
 	Baron_Titles                  []*Baron_Title
 	Story_Barons                  []*Story_Baron
+	Dynasties                     []*Dynasty
+	Dynasty_Cultures              []*Dynasty_Culture
+	Dynasty_Religions             []*Dynasty_Religion
+	Story_Dynasties               []*Story_Dynasty
 }
 
 type StoryUpdateDetail struct {
@@ -49,6 +53,10 @@ type StoryUpdateDetail struct {
 	Baron_Buildings               *nebulagolang.CompareResult[*Baron_Building]
 	Baron_Titles                  *nebulagolang.CompareResult[*Baron_Title]
 	Story_Barons                  *nebulagolang.CompareResult[*Story_Baron]
+	Dynasties                     *nebulagolang.CompareResult[*Dynasty]
+	Dynasty_Cultures              *nebulagolang.CompareResult[*Dynasty_Culture]
+	Dynasty_Religions             *nebulagolang.CompareResult[*Dynasty_Religion]
+	Story_Dynasties               *nebulagolang.CompareResult[*Story_Dynasty]
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
@@ -87,6 +95,8 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 
 	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cm, rm)
 
+	dynasties, dynasty_cultures, dynasty_religions := GenerateDynasties(file.Dynasties, cm, rm)
+
 	sd := &StoryDetail{
 		Story:                         NewStoryByData(file),
 		Titles:                        titles,
@@ -106,6 +116,10 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		Baron_Buildings:               baron_buildings,
 		Baron_Titles:                  baron_titles,
 		Story_Barons:                  make([]*Story_Baron, 0),
+		Dynasties:                     dynasties,
+		Dynasty_Cultures:              dynasty_cultures,
+		Dynasty_Religions:             dynasty_religions,
+		Story_Dynasties:               make([]*Story_Dynasty, 0),
 	}
 
 	sd.Story.CultureName = cm[sd.Story.Culture]
@@ -121,6 +135,10 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 
 	for _, baron := range barons {
 		sd.Story_Barons = append(sd.Story_Barons, NewStory_Baron(sd.Story, baron))
+	}
+
+	for _, dynasty := range dynasties {
+		sd.Story_Dynasties = append(sd.Story_Dynasties, NewStory_Dynasty(sd.Story, dynasty))
 	}
 
 	return sd
@@ -310,6 +328,38 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Barons = csb
 
+	udr, cdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.PlayID))
+
+	if !udr.Ok {
+		return result, udr
+	}
+
+	result.Dynasties = cdr
+
+	udcr, cdcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.PlayID))
+
+	if !udcr.Ok {
+		return result, udcr
+	}
+
+	result.Dynasty_Cultures = cdcr
+
+	udrr, cdrr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.PlayID))
+
+	if !udrr.Ok {
+		return result, udrr
+	}
+
+	result.Dynasty_Religions = cdrr
+
+	usdr, csdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.PlayID))
+
+	if !usdr.Ok {
+		return result, usdr
+	}
+
+	result.Story_Dynasties = csdr
+
 	return result, ustr
 }
 
@@ -391,11 +441,45 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("Story_Baron updated:", len(story.Story_Barons.Updated))
 		fmt.Println("Story_Baron deleted:", len(story.Story_Barons.Deleted))
 		fmt.Println("Story_Baron kept:", len(story.Story_Barons.Kept))
+		fmt.Println("Dynasty added:", len(story.Dynasties.Added))
+		fmt.Println("Dynasty updated:", len(story.Dynasties.Updated))
+		fmt.Println("Dynasty deleted:", len(story.Dynasties.Deleted))
+		fmt.Println("Dynasty kept:", len(story.Dynasties.Kept))
+		fmt.Println("Dynasty_Culture added:", len(story.Dynasty_Cultures.Added))
+		fmt.Println("Dynasty_Culture updated:", len(story.Dynasty_Cultures.Updated))
+		fmt.Println("Dynasty_Culture deleted:", len(story.Dynasty_Cultures.Deleted))
+		fmt.Println("Dynasty_Culture kept:", len(story.Dynasty_Cultures.Kept))
+		fmt.Println("Dynasty_Religion added:", len(story.Dynasty_Religions.Added))
+		fmt.Println("Dynasty_Religion updated:", len(story.Dynasty_Religions.Updated))
+		fmt.Println("Dynasty_Religion deleted:", len(story.Dynasty_Religions.Deleted))
+		fmt.Println("Dynasty_Religion kept:", len(story.Dynasty_Religions.Kept))
+		fmt.Println("Story_Dynasty added:", len(story.Story_Dynasties.Added))
+		fmt.Println("Story_Dynasty updated:", len(story.Story_Dynasties.Updated))
+		fmt.Println("Story_Dynasty deleted:", len(story.Story_Dynasties.Deleted))
+		fmt.Println("Story_Dynasty kept:", len(story.Story_Dynasties.Kept))
 	}
 }
 
 func DeleteStoryData(playId int) *nebulagolang.Result {
 	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllStory_DynastysByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllDynasty_ReligionsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllDynasty_CulturesByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r
@@ -474,6 +558,12 @@ func DeleteStoryData(playId int) *nebulagolang.Result {
 	}
 
 	r = DeleteAllTitle_BaseTitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllBaronByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

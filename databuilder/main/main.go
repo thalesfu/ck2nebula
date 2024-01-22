@@ -172,7 +172,7 @@ func main() {
 
 	ck2nebula.BuildStory(ck2Folder, saveFile)
 
-	result := ck2nebula.GetAllBaronNamesByPlayId(ck2nebula.SPACE, 199229416)
+	result := ck2nebula.GetDynastyByID(ck2nebula.SPACE, 199229416, 1055025)
 
 	fmt.Println(utils.MarshalJSON(result.Data))
 
