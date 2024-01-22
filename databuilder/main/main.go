@@ -1,6 +1,10 @@
 package main
 
-import "github.com/thalesfu/ck2nebula"
+import (
+	"fmt"
+	"github.com/thalesfu/ck2nebula"
+	"github.com/thalesfu/paradoxtools/utils"
+)
 
 const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
 const saveFile = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\酒泉771_02_14dd.ck2"
@@ -156,17 +160,24 @@ func main() {
 	//resultT := ck2nebula.GetStoryByID(ck2nebula.SPACE, sid)
 
 	//ck2nebula.BuildModifiers(ck2Folder)
+	//ck2nebula.BuildBuildings(ck2Folder)
+	//result := ck2nebula.GetAllBuildingCode(ck2nebula.SPACE)
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	fmt.Println(utils.MarshalJSON(result.Data))
+	//}
 
 	//ck2nebula.DeleteStoryData(199229416)
 
 	ck2nebula.BuildStory(ck2Folder, saveFile)
 
-	//result := ck2nebula.GetAllProvincesByPlayIdAndName(ck2nebula.SPACE, 199229416, "酒泉")
-	//
-	//fmt.Println(utils.MarshalJSON(result.Data))
-	//
-	//for _, c := range result.Commands {
-	//	fmt.Println(c)
-	//}
+	result := ck2nebula.GetAllProvince_TitlesEidsByPlayId(ck2nebula.SPACE, 199229416)
+
+	fmt.Println(utils.MarshalJSON(result.Data))
+
+	for _, c := range result.Commands {
+		fmt.Println(c)
+	}
 
 }
