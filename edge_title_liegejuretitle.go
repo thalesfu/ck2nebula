@@ -14,6 +14,7 @@ func NewTitle_DejureLiegeTitle(t *Title, dlt *Title) *Title_DejureLiegeTitle {
 	return &Title_DejureLiegeTitle{
 		Title:          t,
 		LiegeJureTitle: dlt,
+		PlayID:         t.PlayID,
 	}
 }
 

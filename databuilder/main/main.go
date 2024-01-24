@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/thalesfu/ck2nebula"
+	"github.com/thalesfu/paradoxtools/utils"
 )
 
 const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
@@ -159,7 +161,8 @@ func main() {
 
 	//ck2nebula.BuildModifiers(ck2Folder)
 	//ck2nebula.BuildBuildings(ck2Folder)
-	//result := ck2nebula.GetAllBuildingCode(ck2nebula.SPACE)
+	//ck2nebula.BuildTraits(ck2Folder)
+	//result := ck2nebula.GetTraitById(ck2nebula.SPACE, 56)
 	//if !result.Ok {
 	//	fmt.Println(result.Err.Error())
 	//} else {
@@ -170,12 +173,15 @@ func main() {
 
 	ck2nebula.BuildStory(ck2Folder, saveFile)
 
-	//result := ck2nebula.GetDynastyByID(ck2nebula.SPACE, 199229416, 1055025)
-	//
-	//fmt.Println(utils.MarshalJSON(result.Data))
-	//
-	//for _, c := range result.Commands {
-	//	fmt.Println(c)
-	//}
+	result := ck2nebula.GetAllPeople_RelatePeoplesByPlayId(ck2nebula.SPACE, 199229416)
 
+	if !result.Ok {
+		fmt.Println(result.Err.Error())
+	} else {
+		fmt.Println(utils.MarshalJSON(result.Data))
+
+		for _, c := range result.Commands {
+			fmt.Println(c)
+		}
+	}
 }

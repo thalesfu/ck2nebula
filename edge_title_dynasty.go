@@ -14,6 +14,7 @@ func NewTitle_Dynasty(t *Title, d *Dynasty) *Title_Dynasty {
 	return &Title_Dynasty{
 		Title:   t,
 		Dynasty: d,
+		PlayID:  t.PlayID,
 	}
 }
 

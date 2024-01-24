@@ -15,6 +15,7 @@ func NewTitle_AssimilatingLiegeTitle(t *Title, alt *Title) *Title_AssimilatingLi
 	return &Title_AssimilatingLiegeTitle{
 		Title:                  t,
 		AssimilatingLiegeTitle: alt,
+		PlayID:                 t.PlayID,
 	}
 }
 

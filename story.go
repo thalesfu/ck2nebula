@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/culture"
+	"github.com/thalesfu/paradoxtools/CK2/localisation"
 	"github.com/thalesfu/paradoxtools/CK2/religion"
 	"github.com/thalesfu/paradoxtools/CK2/save"
 	"strings"
@@ -17,6 +18,7 @@ type StoryDetail struct {
 	Title_DejureLiegeTitles       []*Title_DejureLiegeTitle
 	Title_AssimilatingLiegeTitles []*Title_AssimilatingLiegeTitle
 	Title_Dynasties               []*Title_Dynasty
+	Title_People                  []*Title_People
 	Story_Titles                  []*Story_Title
 	Provinces                     []*Province
 	Story_Provinces               []*Story_Province
@@ -33,6 +35,23 @@ type StoryDetail struct {
 	Dynasty_Cultures              []*Dynasty_Culture
 	Dynasty_Religions             []*Dynasty_Religion
 	Story_Dynasties               []*Story_Dynasty
+	People                        []*People
+	People_Cultures               []*People_Culture
+	People_GFXCultures            []*People_GFXCulture
+	People_Religions              []*People_Religion
+	People_SecretReligions        []*People_SecretReligion
+	Story_People                  []*Story_People
+	People_Traits                 []*People_Trait
+	People_Modifiers              []*People_Modifier
+	People_ClaimTitles            []*People_ClaimTitle
+	People_Dynasties              []*People_Dynasty
+	People_Families               []*People_FamilyPeople
+	People_Hosts                  []*People_HostPeople
+	People_Empires                []*People_EmpirePeople
+	People_Killers                []*People_KillPeople
+	People_Relates                []*People_RelatePeople
+	People_Lovers                 []*People_LoverPeople
+	People_Guardians              []*People_GuardianPeople
 }
 
 type StoryUpdateDetail struct {
@@ -43,6 +62,7 @@ type StoryUpdateDetail struct {
 	Title_DejureLiegeTitles       *nebulagolang.CompareResult[*Title_DejureLiegeTitle]
 	Title_AssimilatingLiegeTitles *nebulagolang.CompareResult[*Title_AssimilatingLiegeTitle]
 	Title_Dynasties               *nebulagolang.CompareResult[*Title_Dynasty]
+	Title_People                  *nebulagolang.CompareResult[*Title_People]
 	Story_Titles                  *nebulagolang.CompareResult[*Story_Title]
 	Provinces                     *nebulagolang.CompareResult[*Province]
 	Story_Provinces               *nebulagolang.CompareResult[*Story_Province]
@@ -59,10 +79,29 @@ type StoryUpdateDetail struct {
 	Dynasty_Cultures              *nebulagolang.CompareResult[*Dynasty_Culture]
 	Dynasty_Religions             *nebulagolang.CompareResult[*Dynasty_Religion]
 	Story_Dynasties               *nebulagolang.CompareResult[*Story_Dynasty]
+	People                        *nebulagolang.CompareResult[*People]
+	People_Cultures               *nebulagolang.CompareResult[*People_Culture]
+	People_GFXCultures            *nebulagolang.CompareResult[*People_GFXCulture]
+	People_Religions              *nebulagolang.CompareResult[*People_Religion]
+	People_SecretReligions        *nebulagolang.CompareResult[*People_SecretReligion]
+	Story_People                  *nebulagolang.CompareResult[*Story_People]
+	People_Traits                 *nebulagolang.CompareResult[*People_Trait]
+	People_Modifiers              *nebulagolang.CompareResult[*People_Modifier]
+	People_ClaimTitles            *nebulagolang.CompareResult[*People_ClaimTitle]
+	People_Dynasties              *nebulagolang.CompareResult[*People_Dynasty]
+	People_Families               *nebulagolang.CompareResult[*People_FamilyPeople]
+	People_Hosts                  *nebulagolang.CompareResult[*People_HostPeople]
+	People_Empires                *nebulagolang.CompareResult[*People_EmpirePeople]
+	People_Killers                *nebulagolang.CompareResult[*People_KillPeople]
+	People_Relates                *nebulagolang.CompareResult[*People_RelatePeople]
+	People_Lovers                 *nebulagolang.CompareResult[*People_LoverPeople]
+	People_Guardians              *nebulagolang.CompareResult[*People_GuardianPeople]
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
 	s, ok := save.LoadSave(path, savePath)
+
+	translations := localisation.LoadAllTranslations(path)
 
 	if !ok {
 		return nil
@@ -86,18 +125,42 @@ func GetStory(path string, savePath string) *StoryDetail {
 		}
 	}
 
-	detail := GenerateStoryDetails(s, cm, rm)
+	detail := GenerateStoryDetails(s, cm, rm, translations)
 
 	return detail
 }
 
-func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[string]string) *StoryDetail {
+func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[string]string, translations map[string]string) *StoryDetail {
 
-	titles, baseTitles, liegeTitles, dejureLiegeTitles, assimilatingLiegeTitles, title_dynasties := GenerateTitles(file.Titles)
+	titles,
+		baseTitles,
+		liegeTitles,
+		dejureLiegeTitles,
+		assimilatingLiegeTitles,
+		title_dynasties,
+		title_people := GenerateTitles(file.Titles)
 
 	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cm, rm)
 
 	dynasties, dynasty_cultures, dynasty_religions := GenerateDynasties(file.Dynasties, cm, rm)
+
+	people,
+		people_cultures,
+		people_gfxCultures,
+		people_religions,
+		people_secretReligions,
+		people_traits,
+		people_modifiers,
+		people_claimTitles,
+		people_dynasties,
+		people_families,
+		people_hosts,
+		people_empires,
+		people_killers,
+		people_lovers,
+		people_guardians := GeneratePeople(file.Characters, cm, rm)
+
+	people_relations := GenerateRelations(file, translations)
 
 	sd := &StoryDetail{
 		Story:                         NewStoryByData(file),
@@ -107,6 +170,7 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		Title_DejureLiegeTitles:       dejureLiegeTitles,
 		Title_AssimilatingLiegeTitles: assimilatingLiegeTitles,
 		Title_Dynasties:               title_dynasties,
+		Title_People:                  title_people,
 		Story_Titles:                  make([]*Story_Title, 0),
 		Provinces:                     provinces,
 		Story_Provinces:               make([]*Story_Province, 0),
@@ -123,6 +187,23 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		Dynasty_Cultures:              dynasty_cultures,
 		Dynasty_Religions:             dynasty_religions,
 		Story_Dynasties:               make([]*Story_Dynasty, 0),
+		People:                        people,
+		People_Cultures:               people_cultures,
+		People_GFXCultures:            people_gfxCultures,
+		People_Religions:              people_religions,
+		People_SecretReligions:        people_secretReligions,
+		Story_People:                  make([]*Story_People, 0),
+		People_Traits:                 people_traits,
+		People_Modifiers:              people_modifiers,
+		People_ClaimTitles:            people_claimTitles,
+		People_Dynasties:              people_dynasties,
+		People_Families:               people_families,
+		People_Hosts:                  people_hosts,
+		People_Empires:                people_empires,
+		People_Killers:                people_killers,
+		People_Relates:                people_relations,
+		People_Lovers:                 people_lovers,
+		People_Guardians:              people_guardians,
 	}
 
 	sd.Story.CultureName = cm[sd.Story.Culture]
@@ -142,6 +223,10 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 
 	for _, dynasty := range dynasties {
 		sd.Story_Dynasties = append(sd.Story_Dynasties, NewStory_Dynasty(sd.Story, dynasty))
+	}
+
+	for _, p := range people {
+		sd.Story_People = append(sd.Story_People, NewStory_People(sd.Story, p))
 	}
 
 	return sd
@@ -242,6 +327,14 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 	}
 
 	result.Title_Dynasties = ctdr
+
+	utp, ctp := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_People, getPlayIdQuery[Title_People](s.Story.PlayID))
+
+	if !utp.Ok {
+		return result, utp
+	}
+
+	result.Title_People = ctp
 
 	ustr, cstr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.PlayID))
 
@@ -371,6 +464,142 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Dynasties = csdr
 
+	upeopler, cpeopler := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People, getPlayIdQuery[People](s.Story.PlayID))
+
+	if !upeopler.Ok {
+		return result, upeopler
+	}
+
+	result.People = cpeopler
+
+	upeople_cr, cpeople_cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.PlayID))
+
+	if !upeople_cr.Ok {
+		return result, upeople_cr
+	}
+
+	result.People_Cultures = cpeople_cr
+
+	upeople_gfxcr, cpeople_gfxcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.PlayID))
+
+	if !upeople_gfxcr.Ok {
+		return result, upeople_gfxcr
+	}
+
+	result.People_GFXCultures = cpeople_gfxcr
+
+	upeople_rr, cpeople_rr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.PlayID))
+
+	if !upeople_rr.Ok {
+		return result, upeople_rr
+	}
+
+	result.People_Religions = cpeople_rr
+
+	upeople_srr, cpeople_srr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.PlayID))
+
+	if !upeople_srr.Ok {
+		return result, upeople_srr
+	}
+
+	result.People_SecretReligions = cpeople_srr
+
+	u_story_people_r, c_story_people_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_People, getPlayIdQuery[Story_People](s.Story.PlayID))
+
+	if !u_story_people_r.Ok {
+		return result, u_story_people_r
+	}
+
+	result.Story_People = c_story_people_r
+
+	upeople_tr, cpeople_tr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.PlayID))
+
+	if !upeople_tr.Ok {
+		return result, upeople_tr
+	}
+
+	result.People_Traits = cpeople_tr
+
+	upeople_mr, cpeople_mr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.PlayID))
+
+	if !upeople_mr.Ok {
+		return result, upeople_mr
+	}
+
+	result.People_Modifiers = cpeople_mr
+
+	upeople_ctr, cpeople_ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.PlayID))
+
+	if !upeople_ctr.Ok {
+		return result, upeople_ctr
+	}
+
+	result.People_ClaimTitles = cpeople_ctr
+
+	upeople_dr, cpeople_dr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.PlayID))
+
+	if !upeople_dr.Ok {
+		return result, upeople_dr
+	}
+
+	result.People_Dynasties = cpeople_dr
+
+	upeople_fr, cpeople_fr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.PlayID))
+
+	if !upeople_fr.Ok {
+		return result, upeople_fr
+	}
+
+	result.People_Families = cpeople_fr
+
+	upeople_hr, cpeople_hr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.PlayID))
+
+	if !upeople_hr.Ok {
+		return result, upeople_hr
+	}
+
+	result.People_Hosts = cpeople_hr
+
+	upeople_er, cpeople_er := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.PlayID))
+
+	if !upeople_er.Ok {
+		return result, upeople_er
+	}
+
+	result.People_Empires = cpeople_er
+
+	upeople_kr, cpeople_kr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.PlayID))
+
+	if !upeople_kr.Ok {
+		return result, upeople_kr
+	}
+
+	result.People_Killers = cpeople_kr
+
+	upeople_relarte_r, cpeople_r_relate_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.PlayID))
+
+	if !upeople_relarte_r.Ok {
+		return result, upeople_relarte_r
+	}
+
+	result.People_Relates = cpeople_r_relate_r
+
+	upeople_lr, cpeople_lr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.PlayID))
+
+	if !upeople_lr.Ok {
+		return result, upeople_lr
+	}
+
+	result.People_Lovers = cpeople_lr
+
+	upeople_gr, cpeople_gr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.PlayID))
+
+	if !upeople_gr.Ok {
+		return result, upeople_gr
+	}
+
+	result.People_Guardians = cpeople_gr
+
 	return result, ustr
 }
 
@@ -408,6 +637,10 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("Title_Dynasty updated:", len(story.Title_Dynasties.Updated))
 		fmt.Println("Title_Dynasty deleted:", len(story.Title_Dynasties.Deleted))
 		fmt.Println("Title_Dynasty kept:", len(story.Title_Dynasties.Kept))
+		fmt.Println("Title_People added:", len(story.Title_People.Added))
+		fmt.Println("Title_People updated:", len(story.Title_People.Updated))
+		fmt.Println("Title_People deleted:", len(story.Title_People.Deleted))
+		fmt.Println("Title_People kept:", len(story.Title_People.Kept))
 		fmt.Println("Story_Title added:", len(story.Story_Titles.Added))
 		fmt.Println("Story_Title updated:", len(story.Story_Titles.Updated))
 		fmt.Println("Story_Title deleted:", len(story.Story_Titles.Deleted))
@@ -472,11 +705,175 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("Story_Dynasty updated:", len(story.Story_Dynasties.Updated))
 		fmt.Println("Story_Dynasty deleted:", len(story.Story_Dynasties.Deleted))
 		fmt.Println("Story_Dynasty kept:", len(story.Story_Dynasties.Kept))
+		fmt.Println("People added:", len(story.People.Added))
+		fmt.Println("People updated:", len(story.People.Updated))
+		fmt.Println("People deleted:", len(story.People.Deleted))
+		fmt.Println("People kept:", len(story.People.Kept))
+		fmt.Println("People_Culture added:", len(story.People_Cultures.Added))
+		fmt.Println("People_Culture updated:", len(story.People_Cultures.Updated))
+		fmt.Println("People_Culture deleted:", len(story.People_Cultures.Deleted))
+		fmt.Println("People_Culture kept:", len(story.People_Cultures.Kept))
+		fmt.Println("People_GFXCulture added:", len(story.People_GFXCultures.Added))
+		fmt.Println("People_GFXCulture updated:", len(story.People_GFXCultures.Updated))
+		fmt.Println("People_GFXCulture deleted:", len(story.People_GFXCultures.Deleted))
+		fmt.Println("People_GFXCulture kept:", len(story.People_GFXCultures.Kept))
+		fmt.Println("People_Religion added:", len(story.People_Religions.Added))
+		fmt.Println("People_Religion updated:", len(story.People_Religions.Updated))
+		fmt.Println("People_Religion deleted:", len(story.People_Religions.Deleted))
+		fmt.Println("People_Religion kept:", len(story.People_Religions.Kept))
+		fmt.Println("People_SecretReligion added:", len(story.People_SecretReligions.Added))
+		fmt.Println("People_SecretReligion updated:", len(story.People_SecretReligions.Updated))
+		fmt.Println("People_SecretReligion deleted:", len(story.People_SecretReligions.Deleted))
+		fmt.Println("People_SecretReligion kept:", len(story.People_SecretReligions.Kept))
+		fmt.Println("Story_People added:", len(story.Story_People.Added))
+		fmt.Println("Story_People updated:", len(story.Story_People.Updated))
+		fmt.Println("Story_People deleted:", len(story.Story_People.Deleted))
+		fmt.Println("Story_People kept:", len(story.Story_People.Kept))
+		fmt.Println("People_Trait added:", len(story.People_Traits.Added))
+		fmt.Println("People_Trait updated:", len(story.People_Traits.Updated))
+		fmt.Println("People_Trait deleted:", len(story.People_Traits.Deleted))
+		fmt.Println("People_Trait kept:", len(story.People_Traits.Kept))
+		fmt.Println("People_Modifier added:", len(story.People_Modifiers.Added))
+		fmt.Println("People_Modifier updated:", len(story.People_Modifiers.Updated))
+		fmt.Println("People_Modifier deleted:", len(story.People_Modifiers.Deleted))
+		fmt.Println("People_Modifier kept:", len(story.People_Modifiers.Kept))
+		fmt.Println("People_ClaimTitle added:", len(story.People_ClaimTitles.Added))
+		fmt.Println("People_ClaimTitle updated:", len(story.People_ClaimTitles.Updated))
+		fmt.Println("People_ClaimTitle deleted:", len(story.People_ClaimTitles.Deleted))
+		fmt.Println("People_ClaimTitle kept:", len(story.People_ClaimTitles.Kept))
+		fmt.Println("People_Dynasty added:", len(story.People_Dynasties.Added))
+		fmt.Println("People_Dynasty updated:", len(story.People_Dynasties.Updated))
+		fmt.Println("People_Dynasty deleted:", len(story.People_Dynasties.Deleted))
+		fmt.Println("People_Dynasty kept:", len(story.People_Dynasties.Kept))
+		fmt.Println("People_FamilyPeople added:", len(story.People_Families.Added))
+		fmt.Println("People_FamilyPeople updated:", len(story.People_Families.Updated))
+		fmt.Println("People_FamilyPeople deleted:", len(story.People_Families.Deleted))
+		fmt.Println("People_FamilyPeople kept:", len(story.People_Families.Kept))
+		fmt.Println("People_HostPeople added:", len(story.People_Hosts.Added))
+		fmt.Println("People_HostPeople updated:", len(story.People_Hosts.Updated))
+		fmt.Println("People_HostPeople deleted:", len(story.People_Hosts.Deleted))
+		fmt.Println("People_HostPeople kept:", len(story.People_Hosts.Kept))
+		fmt.Println("People_EmpirePeople added:", len(story.People_Empires.Added))
+		fmt.Println("People_EmpirePeople updated:", len(story.People_Empires.Updated))
+		fmt.Println("People_EmpirePeople deleted:", len(story.People_Empires.Deleted))
+		fmt.Println("People_EmpirePeople kept:", len(story.People_Empires.Kept))
+		fmt.Println("People_KillPeople added:", len(story.People_Killers.Added))
+		fmt.Println("People_KillPeople updated:", len(story.People_Killers.Updated))
+		fmt.Println("People_KillPeople deleted:", len(story.People_Killers.Deleted))
+		fmt.Println("People_KillPeople kept:", len(story.People_Killers.Kept))
+		fmt.Println("People_RelatePeople added:", len(story.People_Relates.Added))
+		fmt.Println("People_RelatePeople updated:", len(story.People_Relates.Updated))
+		fmt.Println("People_RelatePeople deleted:", len(story.People_Relates.Deleted))
+		fmt.Println("People_RelatePeople kept:", len(story.People_Relates.Kept))
+		fmt.Println("People_LoverPeople added:", len(story.People_Lovers.Added))
+		fmt.Println("People_LoverPeople updated:", len(story.People_Lovers.Updated))
+		fmt.Println("People_LoverPeople deleted:", len(story.People_Lovers.Deleted))
+		fmt.Println("People_LoverPeople kept:", len(story.People_Lovers.Kept))
+		fmt.Println("People_GuardianPeople added:", len(story.People_Guardians.Added))
+		fmt.Println("People_GuardianPeople updated:", len(story.People_Guardians.Updated))
+		fmt.Println("People_GuardianPeople deleted:", len(story.People_Guardians.Deleted))
+		fmt.Println("People_GuardianPeople kept:", len(story.People_Guardians.Kept))
 	}
 }
 
 func DeleteStoryData(playId int) *nebulagolang.Result {
 	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_LoverByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_GuardianByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_FamilyByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_HostByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_EmpireByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_KillByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_RelateByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_ClaimTitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_DynastiesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_ModifiersByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_TraitsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllStory_PeopleByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_SecretReligionsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_ReligionsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_GFXCulturesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_CulturesByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r
@@ -579,6 +976,18 @@ func DeleteStoryData(playId int) *nebulagolang.Result {
 	}
 
 	r = DeleteAllTitle_DynastysByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllTitle_PeoplesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeopleByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

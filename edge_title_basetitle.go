@@ -14,6 +14,7 @@ func NewTitle_BaseTitle(t *Title, bt *Title) *Title_BaseTitle {
 	return &Title_BaseTitle{
 		Title:     t,
 		BaseTitle: bt,
+		PlayID:    t.PlayID,
 	}
 }
 

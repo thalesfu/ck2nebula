@@ -14,6 +14,7 @@ func NewTitle_LiegeTitle(t *Title, lt *Title) *Title_LiegeTitle {
 	return &Title_LiegeTitle{
 		Title:      t,
 		LiegeTitle: lt,
+		PlayID:     t.PlayID,
 	}
 }
 

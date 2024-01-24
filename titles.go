@@ -10,13 +10,15 @@ func GenerateTitles(titles map[string]*save.Title) (
 	[]*Title_LiegeTitle,
 	[]*Title_DejureLiegeTitle,
 	[]*Title_AssimilatingLiegeTitle,
-	[]*Title_Dynasty) {
+	[]*Title_Dynasty,
+	[]*Title_People) {
 	rts := make([]*Title, len(titles))
 	rtlts := make([]*Title_LiegeTitle, 0)
 	rtbts := make([]*Title_BaseTitle, 0)
 	rtdlts := make([]*Title_DejureLiegeTitle, 0)
 	rtalts := make([]*Title_AssimilatingLiegeTitle, 0)
 	rtds := make([]*Title_Dynasty, 0)
+	rtp := make([]*Title_People, 0)
 
 	i := 0
 	for _, title := range titles {
@@ -27,7 +29,6 @@ func GenerateTitles(titles map[string]*save.Title) (
 				title.Liege.ID = title.Liege.Title
 			}
 			tlt := NewTitle_LiegeTitle(rts[i], NewTitleByData(title.Liege))
-			tlt.PlayID = title.PlayID
 			rtlts = append(rtlts, tlt)
 		}
 
@@ -36,7 +37,6 @@ func GenerateTitles(titles map[string]*save.Title) (
 				title.BaseTitle.ID = title.BaseTitle.Title
 			}
 			tbt := NewTitle_BaseTitle(rts[i], NewTitleByData(title.BaseTitle))
-			tbt.PlayID = title.PlayID
 			rtbts = append(rtbts, tbt)
 		}
 
@@ -45,7 +45,6 @@ func GenerateTitles(titles map[string]*save.Title) (
 				title.DeJureLiege.ID = title.DeJureLiege.Title
 			}
 			tdlt := NewTitle_DejureLiegeTitle(rts[i], NewTitleByData(title.DeJureLiege))
-			tdlt.PlayID = title.PlayID
 			rtdlts = append(rtdlts, tdlt)
 		}
 
@@ -55,18 +54,21 @@ func GenerateTitles(titles map[string]*save.Title) (
 			}
 			talt := NewTitle_AssimilatingLiegeTitle(rts[i], NewTitleByData(title.AssimilatingLiege))
 			talt.DeJureAssYears = title.DeJureAssYears
-			talt.PlayID = title.PlayID
 			rtalts = append(rtalts, talt)
 		}
 
 		if title.Dynasty != 0 {
 			td := NewTitle_Dynasty(rts[i], NewDynasty(title.PlayID, title.Dynasty))
-			td.PlayID = title.PlayID
 			rtds = append(rtds, td)
+		}
+
+		if title.Holder != 0 {
+			tpe := NewTitle_People(rts[i], NewPeople(title.PlayID, title.Holder))
+			rtp = append(rtp, tpe)
 		}
 
 		i++
 	}
 
-	return rts, rtbts, rtlts, rtdlts, rtalts, rtds
+	return rts, rtbts, rtlts, rtdlts, rtalts, rtds, rtp
 }
