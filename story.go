@@ -103,7 +103,11 @@ type StoryUpdateDetail struct {
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
-	s, ok := save.LoadSave(path, savePath)
+	s, ok, err := save.LoadSave(path, savePath)
+
+	if err != nil {
+		return nil
+	}
 
 	translations := localisation.LoadAllTranslations(path)
 
