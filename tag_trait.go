@@ -72,10 +72,6 @@ type Trait struct {
 	Culture                         string  `nebulaproperty:"culture" description:"culture" nebulaindexes:"culture" json:"culture,omitempty"`
 	HasCharacterFlag                string  `nebulaproperty:"has_character_flag" description:"has_character_flag" nebulaindexes:"has_character_flag" json:"has_character_flag,omitempty"`
 	GraphicalCulture                string  `nebulaproperty:"graphical_culture" description:"graphical_culture" nebulaindexes:"graphical_culture" json:"graphical_culture,omitempty"`
-	Fertility                       float32 `nebulaproperty:"fertility" description:"fertility" nebulaindexes:"fertility" json:"fertility,omitempty"`
-	Health                          float32 `nebulaproperty:"health" description:"health" nebulaindexes:"health" json:"health,omitempty"`
-	FertilityPenalty                float32 `nebulaproperty:"fertility_penalty" description:"fertility_penalty" nebulaindexes:"fertility_penalty" json:"fertility_penalty,omitempty"`
-	HealthPenalty                   float32 `nebulaproperty:"health_penalty" description:"health_penalty" nebulaindexes:"health_penalty" json:"health_penalty,omitempty"`
 	MonthlyCharacterPiety           float32 `nebulaproperty:"monthly_character_piety" description:"monthly_character_piety" nebulaindexes:"monthly_character_piety" json:"monthly_character_piety,omitempty"`
 	GlobalTaxModifier               float32 `nebulaproperty:"global_tax_modifier" description:"global_tax_modifier" nebulaindexes:"global_tax_modifier" json:"global_tax_modifier,omitempty"`
 	MonthlyCharacterPrestige        float32 `nebulaproperty:"monthly_character_prestige" description:"monthly_character_prestige" nebulaindexes:"monthly_character_prestige" json:"monthly_character_prestige,omitempty"`
@@ -86,23 +82,27 @@ type Trait struct {
 	MaxManpowerMult                 float32 `nebulaproperty:"max_manpower_mult" description:"max_manpower_mult" nebulaindexes:"max_manpower_mult" json:"max_manpower_mult,omitempty"`
 	GlobalRevoltRisk                float32 `nebulaproperty:"global_revolt_risk" description:"global_revolt_risk" nebulaindexes:"global_revolt_risk" json:"global_revolt_risk,omitempty"`
 	Attrition                       float32 `nebulaproperty:"attrition" description:"attrition" nebulaindexes:"attrition" json:"attrition,omitempty"`
-	Intrigue                        int     `nebulaproperty:"intrigue" description:"intrigue" nebulaindexes:"intrigue" json:"intrigue,omitempty"`
-	Stewardship                     int     `nebulaproperty:"stewardship" description:"stewardship" nebulaindexes:"stewardship" json:"stewardship,omitempty"`
-	CombatRating                    int     `nebulaproperty:"combat_rating" description:"combat_rating" nebulaindexes:"combat_rating" json:"combat_rating,omitempty"`
-	Martial                         int     `nebulaproperty:"martial" description:"martial" nebulaindexes:"martial" json:"martial,omitempty"`
 	Diplomacy                       int     `nebulaproperty:"diplomacy" description:"diplomacy" nebulaindexes:"diplomacy" json:"diplomacy,omitempty"`
+	Martial                         int     `nebulaproperty:"martial" description:"martial" nebulaindexes:"martial" json:"martial,omitempty"`
+	Stewardship                     int     `nebulaproperty:"stewardship" description:"stewardship" nebulaindexes:"stewardship" json:"stewardship,omitempty"`
+	Intrigue                        int     `nebulaproperty:"intrigue" description:"intrigue" nebulaindexes:"intrigue" json:"intrigue,omitempty"`
 	Learning                        int     `nebulaproperty:"learning" description:"learning" nebulaindexes:"learning" json:"learning,omitempty"`
+	Fertility                       float32 `nebulaproperty:"fertility" description:"fertility" nebulaindexes:"fertility" json:"fertility,omitempty"`
+	Health                          float32 `nebulaproperty:"health" description:"health" nebulaindexes:"health" json:"health,omitempty"`
+	SexAppealOpinion                int     `nebulaproperty:"sex_appeal_opinion" description:"sex_appeal_opinion" nebulaindexes:"sex_appeal_opinion" json:"sex_appeal_opinion,omitempty"`
+	CombatRating                    int     `nebulaproperty:"combat_rating" description:"combat_rating" nebulaindexes:"combat_rating" json:"combat_rating,omitempty"`
+	DiplomacyPenalty                int     `nebulaproperty:"diplomacy_penalty" description:"diplomacy_penalty" nebulaindexes:"diplomacy_penalty" json:"diplomacy_penalty,omitempty"`
+	MartialPenalty                  int     `nebulaproperty:"martial_penalty" description:"martial_penalty" nebulaindexes:"martial_penalty" json:"martial_penalty,omitempty"`
+	StewardshipPenalty              int     `nebulaproperty:"stewardship_penalty" description:"stewardship_penalty" nebulaindexes:"stewardship_penalty" json:"stewardship_penalty,omitempty"`
+	IntriguePenalty                 int     `nebulaproperty:"intrigue_penalty" description:"intrigue_penalty" nebulaindexes:"intrigue_penalty" json:"intrigue_penalty,omitempty"`
+	LearningPenalty                 int     `nebulaproperty:"learning_penalty" description:"learning_penalty" nebulaindexes:"learning_penalty" json:"learning_penalty,omitempty"`
+	FertilityPenalty                float32 `nebulaproperty:"fertility_penalty" description:"fertility_penalty" nebulaindexes:"fertility_penalty" json:"fertility_penalty,omitempty"`
+	HealthPenalty                   float32 `nebulaproperty:"health_penalty" description:"health_penalty" nebulaindexes:"health_penalty" json:"health_penalty,omitempty"`
 	LeadershipTraits                int     `nebulaproperty:"leadership_traits" description:"leadership_traits" nebulaindexes:"leadership_traits" json:"leadership_traits,omitempty"`
 	AiZeal                          int     `nebulaproperty:"ai_zeal" description:"ai_zeal" nebulaindexes:"ai_zeal" json:"ai_zeal,omitempty"`
 	VassalOpinion                   int     `nebulaproperty:"vassal_opinion" description:"vassal_opinion" nebulaindexes:"vassal_opinion" json:"vassal_opinion,omitempty"`
-	SexAppealOpinion                int     `nebulaproperty:"sex_appeal_opinion" description:"sex_appeal_opinion" nebulaindexes:"sex_appeal_opinion" json:"sex_appeal_opinion,omitempty"`
 	SameOpinion                     int     `nebulaproperty:"same_opinion" description:"same_opinion" nebulaindexes:"same_opinion" json:"same_opinion,omitempty"`
 	AiRationality                   int     `nebulaproperty:"ai_rationality" description:"ai_rationality" nebulaindexes:"ai_rationality" json:"ai_rationality,omitempty"`
-	DiplomacyPenalty                int     `nebulaproperty:"diplomacy_penalty" description:"diplomacy_penalty" nebulaindexes:"diplomacy_penalty" json:"diplomacy_penalty,omitempty"`
-	StewardshipPenalty              int     `nebulaproperty:"stewardship_penalty" description:"stewardship_penalty" nebulaindexes:"stewardship_penalty" json:"stewardship_penalty,omitempty"`
-	MartialPenalty                  int     `nebulaproperty:"martial_penalty" description:"martial_penalty" nebulaindexes:"martial_penalty" json:"martial_penalty,omitempty"`
-	IntriguePenalty                 int     `nebulaproperty:"intrigue_penalty" description:"intrigue_penalty" nebulaindexes:"intrigue_penalty" json:"intrigue_penalty,omitempty"`
-	LearningPenalty                 int     `nebulaproperty:"learning_penalty" description:"learning_penalty" nebulaindexes:"learning_penalty" json:"learning_penalty,omitempty"`
 	InheritChance                   int     `nebulaproperty:"inherit_chance" description:"inherit_chance" nebulaindexes:"inherit_chance" json:"inherit_chance,omitempty"`
 	GeneralOpinion                  int     `nebulaproperty:"general_opinion" description:"general_opinion" nebulaindexes:"general_opinion" json:"general_opinion,omitempty"`
 	ChurchOpinion                   int     `nebulaproperty:"church_opinion" description:"church_opinion" nebulaindexes:"church_opinion" json:"church_opinion,omitempty"`

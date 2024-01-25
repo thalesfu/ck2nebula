@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GeneratePeople(characters map[int]*save.Character, cm map[string]string, rm map[string]string) (
+func GeneratePeople(file *save.SaveFile, cm map[string]string, rm map[string]string) (
 	[]*People,
 	[]*People_Culture,
 	[]*People_GFXCulture,
@@ -20,8 +20,10 @@ func GeneratePeople(characters map[int]*save.Character, cm map[string]string, rm
 	[]*People_EmpirePeople,
 	[]*People_KillPeople,
 	[]*People_LoverPeople,
-	[]*People_GuardianPeople) {
-	rp := make([]*People, len(characters))
+	[]*People_GuardianPeople,
+	[]*People_Ambition,
+	[]*People_Focus) {
+	rp := make([]*People, len(file.Characters))
 	rpcs := make([]*People_Culture, 0)
 	rpgcs := make([]*People_GFXCulture, 0)
 	rprs := make([]*People_Religion, 0)
@@ -36,14 +38,56 @@ func GeneratePeople(characters map[int]*save.Character, cm map[string]string, rm
 	rpkps := make([]*People_KillPeople, 0)
 	rplps := make([]*People_LoverPeople, 0)
 	rpgps := make([]*People_GuardianPeople, 0)
+	rpas := make([]*People_Ambition, 0)
+	rpfs := make([]*People_Focus, 0)
+	pm := make(map[int]*People)
+
+	modifiers := GetAllModifier(SPACE).Data
+	traitsMap := GetAllTraitsMap(SPACE).Data
+	objectives := GetAllObjective(SPACE).Data
 
 	i := 0
-	for _, c := range characters {
+	for _, c := range file.Characters {
 		rp[i] = NewPeopleByData(c)
+
+		if rp[i].Dynasty > 0 {
+			d, ok := file.Dynasties[rp[i].Dynasty]
+
+			if ok {
+				rp[i].DynastyName = d.Name
+
+				if d.Culture != "" {
+					rp[i].Culture = d.Culture
+				}
+
+				if d.Religion != "" {
+					rp[i].Religion = d.Religion
+				}
+			}
+		}
+
 		rp[i].ReligionName = rm[rp[i].Religion]
 		rp[i].SecretReligionName = rm[rp[i].SecretReligion]
 		rp[i].CultureName = cm[rp[i].Culture]
 		rp[i].GFXCultureName = cm[rp[i].GFXCulture]
+
+		for _, modifier := range c.Modifier {
+			if m, ok := modifiers[getModifierVid(modifier.Modifier)]; ok {
+				processPeopleModify(rp[i], m)
+			}
+		}
+
+		for _, trait := range c.Traits {
+			if t, ok := traitsMap[trait]; ok {
+				processPeopleTrait(rp[i], t)
+			}
+		}
+
+		if rp[i].Religion == "buddhist" {
+			rp[i].ModifiedLearning += 4
+		} else if rp[i].Religion == "taoist" {
+			rp[i].ModifiedStewardship += 2
+		}
 
 		if rp[i].Culture != "" {
 			rpcs = append(rpcs, NewPeople_Culture(rp[i], NewCulture(rp[i].Culture)))
@@ -187,8 +231,92 @@ func GeneratePeople(characters map[int]*save.Character, cm map[string]string, rm
 			rpkps = append(rpkps, killerRelation)
 		}
 
+		pm[rp[i].ID] = rp[i]
+
 		i++
 	}
 
-	return rp, rpcs, rpgcs, rprs, rpsrs, rpts, rpms, rpcts, rpds, rpfps, rphps, rpeps, rpkps, rplps, rpgps
+	if len(file.ActiveFocuses) > 0 {
+		for _, f := range file.ActiveFocuses {
+			if f.Scope != nil && f.Scope.Char > 0 {
+				p, ok := pm[f.Scope.Char]
+				if ok {
+					rpfs = append(rpfs, NewPeople_Focus(p, NewObjective(f.Type)))
+
+					o, ok := objectives[getObjectiveVid(f.Type)]
+					if ok {
+						processPeopleObject(p, o)
+					}
+				}
+			}
+		}
+	}
+
+	if len(file.ActiveAmbitions) > 0 {
+		for _, a := range file.ActiveAmbitions {
+			if a.Scope != nil && a.Scope.Char > 0 {
+				p, ok := pm[a.Scope.Char]
+				if ok {
+					rpas = append(rpas, NewPeople_Ambition(p, NewObjective(a.Type)))
+
+					o, ok := objectives[getObjectiveVid(a.Type)]
+					if ok {
+						processPeopleObject(p, o)
+					}
+				}
+			}
+		}
+	}
+
+	return rp, rpcs, rpgcs, rprs, rpsrs, rpts, rpms, rpcts, rpds, rpfps, rphps, rpeps, rpkps, rplps, rpgps, rpas, rpfs
+}
+
+func processPeopleObject(p *People, o *Objective) {
+	p.ModifiedDiplomacy += o.Diplomacy
+	p.ModifiedMartial += o.Martial
+	p.ModifiedStewardship += o.Stewardship
+	p.ModifiedIntrigue += o.Intrigue
+	p.ModifiedLearning += o.Learning
+	p.ModifiedHealth += o.Health
+	p.ModifiedFertility += o.Fertility
+	p.ModifiedSexAppeal += o.SexAppealOpinion
+	p.ModifiedCombatRating += o.CombatRating
+}
+
+func processPeopleModify(p *People, m *Modifier) {
+	p.ModifiedDiplomacy += m.Diplomacy
+	p.ModifiedMartial += m.DiplomacyPenalty
+	p.ModifiedMartial += m.Martial
+	p.ModifiedMartial += m.MartialPenalty
+	p.ModifiedStewardship += m.Stewardship
+	p.ModifiedStewardship += m.StewardshipPenalty
+	p.ModifiedIntrigue += m.Intrigue
+	p.ModifiedIntrigue += m.IntriguePenalty
+	p.ModifiedLearning += m.Learning
+	p.ModifiedLearning += m.LearningPenalty
+	p.ModifiedHealth += m.Health
+	p.ModifiedHealth += m.HealthPenalty
+	p.ModifiedFertility += m.Fertility
+	p.ModifiedFertility += m.FertilityPenalty
+	p.ModifiedSexAppeal += m.SexAppealOpinion
+	p.ModifiedCombatRating += m.CombatRating
+}
+
+func processPeopleTrait(p *People, t *Trait) {
+	p.ModifiedDiplomacy += t.Diplomacy
+	p.ModifiedMartial += t.DiplomacyPenalty
+	p.ModifiedMartial += t.Martial
+	p.ModifiedMartial += t.MartialPenalty
+	p.ModifiedStewardship += t.Stewardship
+	p.ModifiedStewardship += t.StewardshipPenalty
+	p.ModifiedIntrigue += t.Intrigue
+	p.ModifiedIntrigue += t.IntriguePenalty
+	p.ModifiedLearning += t.Learning
+	p.ModifiedLearning += t.LearningPenalty
+	p.ModifiedHealth += t.Health
+	p.ModifiedHealth += t.HealthPenalty
+	p.ModifiedFertility += t.Fertility
+	p.ModifiedFertility += t.FertilityPenalty
+	p.ModifiedSexAppeal += t.SexAppealOpinion
+	p.ModifiedCombatRating += t.CombatRating
 }

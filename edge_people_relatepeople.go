@@ -72,8 +72,8 @@ func GetPeople_RelatePeopleByEid(space *nebulagolang.Space, eid *nebulagolang.EI
 	return nebulagolang.GetEdgeByEid[*People_RelatePeople](space, eid)
 }
 
-func GetPeople_RelatePeopleByFromAndToIds(space *nebulagolang.Space, fromId string, toId string) *nebulagolang.ResultT[*People_RelatePeople] {
-	return nebulagolang.GetEdgeByEid[*People_RelatePeople](space, nebulagolang.NewEID(fromId, toId, nebulagolang.GetEdgeName[People_RelatePeople]()))
+func GetPeople_RelatePeopleByFromToIdAndRank(space *nebulagolang.Space, fromId string, toId string, rank int) *nebulagolang.ResultT[*People_RelatePeople] {
+	return nebulagolang.GetEdgeByEid[*People_RelatePeople](space, nebulagolang.NewEIDWithRank(fromId, toId, rank, nebulagolang.GetEdgeName[People_RelatePeople]()))
 }
 
 func GetAllPeople_RelatePeoplesEids(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]bool] {

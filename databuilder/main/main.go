@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"github.com/thalesfu/ck2nebula"
-	"github.com/thalesfu/paradoxtools/utils"
-)
+import "github.com/thalesfu/ck2nebula"
 
 const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
 const saveFile = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\酒泉771_02_14dd.ck2"
@@ -160,6 +156,8 @@ func main() {
 	//resultT := ck2nebula.GetStoryByID(ck2nebula.SPACE, sid)
 
 	//ck2nebula.BuildModifiers(ck2Folder)
+	//ck2nebula.BuildObjectives(ck2Folder)
+	//ck2nebula.DeleteAllObjective(ck2nebula.SPACE)
 	//ck2nebula.BuildBuildings(ck2Folder)
 	//ck2nebula.BuildTraits(ck2Folder)
 	//result := ck2nebula.GetTraitById(ck2nebula.SPACE, 56)
@@ -170,18 +168,21 @@ func main() {
 	//}
 
 	//ck2nebula.DeleteStoryData(199229416)
+	//ck2nebula.DeleteAllModifierWithEdges(ck2nebula.SPACE)
+	//result := ck2nebula.DeleteAllPeople_RelatePeoples(ck2nebula.SPACE)
 
 	ck2nebula.BuildStory(ck2Folder, saveFile)
+	//result := ck2nebula.GetAllPeople_RelatePeoplesByPlayId(ck2nebula.SPACE, 199229416)
+	//
 
-	result := ck2nebula.GetAllPeople_RelatePeoplesByPlayId(ck2nebula.SPACE, 199229416)
-
-	if !result.Ok {
-		fmt.Println(result.Err.Error())
-	} else {
-		fmt.Println(utils.MarshalJSON(result.Data))
-
-		for _, c := range result.Commands {
-			fmt.Println(c)
-		}
-	}
+	//ck2nebula.BuildModifiers(ck2Folder)
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	//fmt.Println(utils.MarshalJSON(result.Data))
+	//
+	//	for _, c := range result.Commands {
+	//		fmt.Println(c)
+	//	}
+	//}
 }

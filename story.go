@@ -52,6 +52,8 @@ type StoryDetail struct {
 	People_Relates                []*People_RelatePeople
 	People_Lovers                 []*People_LoverPeople
 	People_Guardians              []*People_GuardianPeople
+	People_Ambtions               []*People_Ambition
+	People_Focuses                []*People_Focus
 }
 
 type StoryUpdateDetail struct {
@@ -96,6 +98,8 @@ type StoryUpdateDetail struct {
 	People_Relates                *nebulagolang.CompareResult[*People_RelatePeople]
 	People_Lovers                 *nebulagolang.CompareResult[*People_LoverPeople]
 	People_Guardians              *nebulagolang.CompareResult[*People_GuardianPeople]
+	People_Ambtions               *nebulagolang.CompareResult[*People_Ambition]
+	People_Focuses                *nebulagolang.CompareResult[*People_Focus]
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
@@ -158,7 +162,9 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		people_empires,
 		people_killers,
 		people_lovers,
-		people_guardians := GeneratePeople(file.Characters, cm, rm)
+		people_guardians,
+		people_ambtions,
+		people_focuses := GeneratePeople(file, cm, rm)
 
 	people_relations := GenerateRelations(file, translations)
 
@@ -204,6 +210,8 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		People_Relates:                people_relations,
 		People_Lovers:                 people_lovers,
 		People_Guardians:              people_guardians,
+		People_Ambtions:               people_ambtions,
+		People_Focuses:                people_focuses,
 	}
 
 	sd.Story.CultureName = cm[sd.Story.Culture]
@@ -600,6 +608,22 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Guardians = cpeople_gr
 
+	upeople_ar, cpeople_ar := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.PlayID))
+
+	if !upeople_ar.Ok {
+		return result, upeople_ar
+	}
+
+	result.People_Ambtions = cpeople_ar
+
+	u_people_focuses_r, c_people_focuses_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.PlayID))
+
+	if !u_people_focuses_r.Ok {
+		return result, u_people_focuses_r
+	}
+
+	result.People_Focuses = c_people_focuses_r
+
 	return result, ustr
 }
 
@@ -773,11 +797,31 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("People_GuardianPeople updated:", len(story.People_Guardians.Updated))
 		fmt.Println("People_GuardianPeople deleted:", len(story.People_Guardians.Deleted))
 		fmt.Println("People_GuardianPeople kept:", len(story.People_Guardians.Kept))
+		fmt.Println("People_Ambition added:", len(story.People_Ambtions.Added))
+		fmt.Println("People_Ambition updated:", len(story.People_Ambtions.Updated))
+		fmt.Println("People_Ambition deleted:", len(story.People_Ambtions.Deleted))
+		fmt.Println("People_Ambition kept:", len(story.People_Ambtions.Kept))
+		fmt.Println("People_Focus added:", len(story.People_Focuses.Added))
+		fmt.Println("People_Focus updated:", len(story.People_Focuses.Updated))
+		fmt.Println("People_Focus deleted:", len(story.People_Focuses.Deleted))
+		fmt.Println("People_Focus kept:", len(story.People_Focuses.Kept))
 	}
 }
 
 func DeleteStoryData(playId int) *nebulagolang.Result {
 	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_AmbitionsByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllPeople_FocusesByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

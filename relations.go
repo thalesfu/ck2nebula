@@ -51,42 +51,58 @@ func generateRelations(src *save.Character, dst *save.Character, rel *save.Perso
 	rank := 0
 
 	if rel.RY != 0 {
-		relations = append(relations, generateReignedYearsRelation(src, dst, rel.RY))
+		relation := generateReignedYearsRelation(src, dst, rel.RY)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.LooterHostilityDays > 0 {
-		relations = append(relations, generateLooterHostilityDaysRelation(src, dst, rel.RY))
+		relation := generateLooterHostilityDaysRelation(src, dst, rel.LooterHostilityDays)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.Alliance {
-		relations = append(relations, generateAllianceRelation(src, dst))
+		relation := generateAllianceRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.CanCallToWar {
-		relations = append(relations, generateCanCallToWarRelation(src, dst))
+		relation := generateCanCallToWarRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.DisableNonAggressionPacts {
-		relations = append(relations, generateDisableNonAggressionPactsRelation(src, dst))
+		relation := generateDisableNonAggressionPactsRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.IsLooter {
-		relations = append(relations, generateIsLooterRelation(src, dst))
+		relation := generateIsLooterRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.Succession {
-		relations = append(relations, generateSuccessionRelation(src, dst))
+		relation := generateSuccessionRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 	}
 
 	if rel.NonAggressionPact {
-		relations = append(relations, generateNonAggressionPactRelation(src, dst))
+		relation := generateNonAggressionPactRelation(src, dst)
+		relation.Rank = rank
+		relations = append(relations, relation)
 		rank++
 
 	}
