@@ -7,14 +7,14 @@ import (
 type Title_LiegeTitle struct {
 	Title      *Title `nebulaedgename:"title_liegetitle" nebulaedgecomment:"Title -> Liege Title" nebulakey:"edgefrom" json:"from,omitempty"`
 	LiegeTitle *Title `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID     int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID    int    `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewTitle_LiegeTitle(t *Title, lt *Title) *Title_LiegeTitle {
 	return &Title_LiegeTitle{
 		Title:      t,
 		LiegeTitle: lt,
-		PlayID:     t.PlayID,
+		StoryID:    t.StoryID,
 	}
 }
 

@@ -26,24 +26,21 @@ type Title struct {
 	Temporary          bool   `nebulaproperty:"temporary" description:"title is temporary" nebulaindexes:"temporary" json:"temporary,omitempty"`
 	CoatOfArmsData     string `nebulaproperty:"coat_of_arms_data" description:"coat_of_arms_data" nebulaindexes:"coat_of_arms_data" json:"coat_of_arms_data,omitempty"`
 	CoatOfArmsReligion string `nebulaproperty:"coat_of_arms_religion" description:"coat_of_arms_religion" nebulaindexes:"coat_of_arms_religion" json:"coat_of_arms_religion,omitempty"`
-	PlayID             int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
-
-	//Holder            int              `paradox_field:"holder" json:"holder,omitempty"`
-	//Dynasty           int
+	StoryID            int    `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
-func NewTitle(playId int, titleId string) *Title {
+func NewTitle(storyId int, titleId string) *Title {
 	nebulaTitle := Title{
-		VID:    getTitleVid(playId, titleId),
-		ID:     titleId,
-		PlayID: playId,
+		VID:     getTitleVid(storyId, titleId),
+		ID:      titleId,
+		StoryID: storyId,
 	}
 	return &nebulaTitle
 }
 
 func NewTitleByData(title *save.Title) *Title {
 	nebulaTitle := utils.Mapping[Title](title)
-	nebulaTitle.VID = getTitleVid(nebulaTitle.PlayID, nebulaTitle.ID)
+	nebulaTitle.VID = getTitleVid(nebulaTitle.StoryID, nebulaTitle.ID)
 
 	if title.CoatOfArms != nil {
 		if len(title.CoatOfArms.Data) > 0 {

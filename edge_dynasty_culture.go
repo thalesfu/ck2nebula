@@ -7,14 +7,14 @@ import (
 type Dynasty_Culture struct {
 	Dynasty *Dynasty `nebulaedgename:"dynasty_culture" nebulaedgecomment:"Dynasty -> Culture" nebulakey:"edgefrom" json:"from,omitempty"`
 	Culture *Culture `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID  int      `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID int      `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewDynasty_Culture(d *Dynasty, c *Culture) *Dynasty_Culture {
 	return &Dynasty_Culture{
 		Dynasty: d,
 		Culture: c,
-		PlayID:  d.PlayID,
+		StoryID: d.StoryID,
 	}
 }
 

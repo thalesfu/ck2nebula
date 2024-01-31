@@ -13,27 +13,27 @@ type Trait struct {
 	ID                              int     `nebulaproperty:"id" description:"id" nebulaindexes:"id" json:"id,omitempty"`
 	Name                            string  `nebulaproperty:"name" description:"name" nebulaindexes:"name" json:"name,omitempty"`
 	Description                     string  `nebulaproperty:"description" description:"description" nebulaindexes:"description" json:"description,omitempty"`
-	Education                       bool    `nebulaproperty:"education" description:"education" nebulaindexes:"education" json:"education,omitempty"`
-	IsHealth                        bool    `nebulaproperty:"is_health" description:"is_health" nebulaindexes:"is_health" json:"is_health,omitempty"`
-	IsIllness                       bool    `nebulaproperty:"is_illness" description:"is_illness" nebulaindexes:"is_illness" json:"is_illness,omitempty"`
-	Customizer                      bool    `nebulaproperty:"customizer" description:"customizer" nebulaindexes:"customizer" json:"customizer,omitempty"`
-	SuccessionGfx                   bool    `nebulaproperty:"succession_gfx" description:"succession_gfx" nebulaindexes:"succession_gfx" json:"succession_gfx,omitempty"`
-	Incapacitating                  bool    `nebulaproperty:"incapacitating" description:"incapacitating" nebulaindexes:"incapacitating" json:"incapacitating,omitempty"`
-	IsEpidemic                      bool    `nebulaproperty:"is_epidemic" description:"is_epidemic" nebulaindexes:"is_epidemic" json:"is_epidemic,omitempty"`
-	Religious                       bool    `nebulaproperty:"religious" description:"religious" nebulaindexes:"religious" json:"religious,omitempty"`
+	Education                       bool    `nebulaproperty:"education" description:"教育" nebulaindexes:"education" json:"education,omitempty"`
+	IsHealth                        bool    `nebulaproperty:"is_health" description:"不健康" nebulaindexes:"is_health" json:"is_health,omitempty"`
+	IsIllness                       bool    `nebulaproperty:"is_illness" description:"有疾病" nebulaindexes:"is_illness" json:"is_illness,omitempty"`
+	Customizer                      bool    `nebulaproperty:"customizer" description:"特殊定制" nebulaindexes:"customizer" json:"customizer,omitempty"`
+	SuccessionGfx                   bool    `nebulaproperty:"succession_gfx" description:"传染病" nebulaindexes:"succession_gfx" json:"succession_gfx,omitempty"`
+	Incapacitating                  bool    `nebulaproperty:"incapacitating" description:"无能的" nebulaindexes:"incapacitating" json:"incapacitating,omitempty"`
+	IsEpidemic                      bool    `nebulaproperty:"is_epidemic" description:"流行病" nebulaindexes:"is_epidemic" json:"is_epidemic,omitempty"`
+	Religious                       bool    `nebulaproperty:"religious" description:"宗教的" nebulaindexes:"religious" json:"religious,omitempty"`
 	Random                          bool    `nebulaproperty:"random" description:"random" nebulaindexes:"random" json:"random,omitempty"`
-	Inbred                          bool    `nebulaproperty:"inbred" description:"inbred" nebulaindexes:"inbred" json:"inbred,omitempty"`
-	Lifestyle                       bool    `nebulaproperty:"lifestyle" description:"lifestyle" nebulaindexes:"lifestyle" json:"lifestyle,omitempty"`
-	Personality                     bool    `nebulaproperty:"personality" description:"personality" nebulaindexes:"personality" json:"personality,omitempty"`
-	Vice                            bool    `nebulaproperty:"vice" description:"vice" nebulaindexes:"vice" json:"vice,omitempty"`
-	Virtue                          bool    `nebulaproperty:"virtue" description:"virtue" nebulaindexes:"virtue" json:"virtue,omitempty"`
-	Leader                          bool    `nebulaproperty:"leader" description:"leader" nebulaindexes:"leader" json:"leader,omitempty"`
+	Inbred                          bool    `nebulaproperty:"inbred" description:"近亲" nebulaindexes:"inbred" json:"inbred,omitempty"`
+	Lifestyle                       bool    `nebulaproperty:"lifestyle" description:"生活模式" nebulaindexes:"lifestyle" json:"lifestyle,omitempty"`
+	Personality                     bool    `nebulaproperty:"personality" description:"人格" nebulaindexes:"personality" json:"personality,omitempty"`
+	Vice                            bool    `nebulaproperty:"vice" description:"恶习" nebulaindexes:"vice" json:"vice,omitempty"`
+	Virtue                          bool    `nebulaproperty:"virtue" description:"美德" nebulaindexes:"virtue" json:"virtue,omitempty"`
+	Leader                          bool    `nebulaproperty:"leader" description:"将领" nebulaindexes:"leader" json:"leader,omitempty"`
 	Cached                          bool    `nebulaproperty:"cached" description:"cached" nebulaindexes:"cached" json:"cached,omitempty"`
-	Pilgrimage                      bool    `nebulaproperty:"pilgrimage" description:"pilgrimage" nebulaindexes:"pilgrimage" json:"pilgrimage,omitempty"`
+	Pilgrimage                      bool    `nebulaproperty:"pilgrimage" description:"朝圣" nebulaindexes:"pilgrimage" json:"pilgrimage,omitempty"`
 	Agnatic                         bool    `nebulaproperty:"agnatic" description:"agnatic" nebulaindexes:"agnatic" json:"agnatic,omitempty"`
 	CannotMarry                     bool    `nebulaproperty:"cannot_marry" description:"cannot_marry" nebulaindexes:"cannot_marry" json:"cannot_marry,omitempty"`
 	CannotInherit                   bool    `nebulaproperty:"cannot_inherit" description:"cannot_inherit" nebulaindexes:"cannot_inherit" json:"cannot_inherit,omitempty"`
-	Blinding                        bool    `nebulaproperty:"blinding" description:"blinding" nebulaindexes:"blinding" json:"blinding,omitempty"`
+	Blinding                        bool    `nebulaproperty:"blinding" description:"致盲" nebulaindexes:"blinding" json:"blinding,omitempty"`
 	RebelInherited                  bool    `nebulaproperty:"rebel_inherited" description:"rebel_inherited" nebulaindexes:"rebel_inherited" json:"rebel_inherited,omitempty"`
 	ToleratesChristian              bool    `nebulaproperty:"tolerates_christian" description:"tolerates_christian" nebulaindexes:"tolerates_christian" json:"tolerates_christian,omitempty"`
 	ToleratesMuslim                 bool    `nebulaproperty:"tolerates_muslim" description:"tolerates_muslim" nebulaindexes:"tolerates_muslim" json:"tolerates_muslim,omitempty"`
@@ -42,12 +42,12 @@ type Trait struct {
 	ToleratesJewishGroup            bool    `nebulaproperty:"tolerates_jewish_group" description:"tolerates_jewish_group" nebulaindexes:"tolerates_jewish_group" json:"tolerates_jewish_group,omitempty"`
 	ToleratesIndianGroup            bool    `nebulaproperty:"tolerates_indian_group" description:"tolerates_indian_group" nebulaindexes:"tolerates_indian_group" json:"tolerates_indian_group,omitempty"`
 	InHiding                        bool    `nebulaproperty:"in_hiding" description:"in_hiding" nebulaindexes:"in_hiding" json:"in_hiding,omitempty"`
-	Childhood                       bool    `nebulaproperty:"childhood" description:"childhood" nebulaindexes:"childhood" json:"childhood,omitempty"`
+	Childhood                       bool    `nebulaproperty:"childhood" description:"儿童" nebulaindexes:"childhood" json:"childhood,omitempty"`
 	CanHoldTitles                   bool    `nebulaproperty:"can_hold_titles" description:"can_hold_titles" nebulaindexes:"can_hold_titles" json:"can_hold_titles,omitempty"`
-	IsSymptom                       bool    `nebulaproperty:"is_symptom" description:"is_symptom" nebulaindexes:"is_symptom" json:"is_symptom,omitempty"`
-	Immortal                        bool    `nebulaproperty:"immortal" description:"immortal" nebulaindexes:"immortal" json:"immortal,omitempty"`
-	Hidden                          bool    `nebulaproperty:"hidden" description:"hidden" nebulaindexes:"hidden" json:"hidden,omitempty"`
-	HiddenFromOthers                bool    `nebulaproperty:"hidden_from_others" description:"hidden_from_others" nebulaindexes:"hidden_from_others" json:"hidden_from_others,omitempty"`
+	IsSymptom                       bool    `nebulaproperty:"is_symptom" description:"症状" nebulaindexes:"is_symptom" json:"is_symptom,omitempty"`
+	Immortal                        bool    `nebulaproperty:"immortal" description:"永生" nebulaindexes:"immortal" json:"immortal,omitempty"`
+	Hidden                          bool    `nebulaproperty:"hidden" description:"隐藏" nebulaindexes:"hidden" json:"hidden,omitempty"`
+	HiddenFromOthers                bool    `nebulaproperty:"hidden_from_others" description:"秘密信徒" nebulaindexes:"hidden_from_others" json:"hidden_from_others,omitempty"`
 	Attribute                       string  `nebulaproperty:"attribute" description:"attribute" nebulaindexes:"attribute" json:"attribute,omitempty"`
 	IsTribal                        string  `nebulaproperty:"is_tribal" description:"is_tribal" nebulaindexes:"is_tribal" json:"is_tribal,omitempty"`
 	ReligionGroup                   string  `nebulaproperty:"religion_group" description:"religion_group" nebulaindexes:"religion_group" json:"religion_group,omitempty"`
@@ -99,18 +99,18 @@ type Trait struct {
 	FertilityPenalty                float32 `nebulaproperty:"fertility_penalty" description:"fertility_penalty" nebulaindexes:"fertility_penalty" json:"fertility_penalty,omitempty"`
 	HealthPenalty                   float32 `nebulaproperty:"health_penalty" description:"health_penalty" nebulaindexes:"health_penalty" json:"health_penalty,omitempty"`
 	LeadershipTraits                int     `nebulaproperty:"leadership_traits" description:"leadership_traits" nebulaindexes:"leadership_traits" json:"leadership_traits,omitempty"`
-	AiZeal                          int     `nebulaproperty:"ai_zeal" description:"ai_zeal" nebulaindexes:"ai_zeal" json:"ai_zeal,omitempty"`
-	VassalOpinion                   int     `nebulaproperty:"vassal_opinion" description:"vassal_opinion" nebulaindexes:"vassal_opinion" json:"vassal_opinion,omitempty"`
+	AiZeal                          int     `nebulaproperty:"ai_zeal" description:"ai热情" nebulaindexes:"ai_zeal" json:"ai_zeal,omitempty"`
+	VassalOpinion                   int     `nebulaproperty:"vassal_opinion" description:"下属评价" nebulaindexes:"vassal_opinion" json:"vassal_opinion,omitempty"`
 	SameOpinion                     int     `nebulaproperty:"same_opinion" description:"same_opinion" nebulaindexes:"same_opinion" json:"same_opinion,omitempty"`
-	AiRationality                   int     `nebulaproperty:"ai_rationality" description:"ai_rationality" nebulaindexes:"ai_rationality" json:"ai_rationality,omitempty"`
-	InheritChance                   int     `nebulaproperty:"inherit_chance" description:"inherit_chance" nebulaindexes:"inherit_chance" json:"inherit_chance,omitempty"`
-	GeneralOpinion                  int     `nebulaproperty:"general_opinion" description:"general_opinion" nebulaindexes:"general_opinion" json:"general_opinion,omitempty"`
-	ChurchOpinion                   int     `nebulaproperty:"church_opinion" description:"church_opinion" nebulaindexes:"church_opinion" json:"church_opinion,omitempty"`
+	AiRationality                   int     `nebulaproperty:"ai_rationality" description:"ai关系" nebulaindexes:"ai_rationality" json:"ai_rationality,omitempty"`
+	InheritChance                   int     `nebulaproperty:"inherit_chance" description:"遗传几率" nebulaindexes:"inherit_chance" json:"inherit_chance,omitempty"`
+	GeneralOpinion                  int     `nebulaproperty:"general_opinion" description:"通用评价" nebulaindexes:"general_opinion" json:"general_opinion,omitempty"`
+	ChurchOpinion                   int     `nebulaproperty:"church_opinion" description:"教会评价" nebulaindexes:"church_opinion" json:"church_opinion,omitempty"`
 	SameOpinionIfSameReligion       int     `nebulaproperty:"same_opinion_if_same_religion" description:"same_opinion_if_same_religion" nebulaindexes:"same_opinion_if_same_religion" json:"same_opinion_if_same_religion,omitempty"`
 	TwinOpinion                     int     `nebulaproperty:"twin_opinion" description:"twin_opinion" nebulaindexes:"twin_opinion" json:"twin_opinion,omitempty"`
 	SpouseOpinion                   int     `nebulaproperty:"spouse_opinion" description:"spouse_opinion" nebulaindexes:"spouse_opinion" json:"spouse_opinion,omitempty"`
 	SameReligionOpinion             int     `nebulaproperty:"same_religion_opinion" description:"same_religion_opinion" nebulaindexes:"same_religion_opinion" json:"same_religion_opinion,omitempty"`
-	DynastyOpinion                  int     `nebulaproperty:"dynasty_opinion" description:"dynasty_opinion" nebulaindexes:"dynasty_opinion" json:"dynasty_opinion,omitempty"`
+	DynastyOpinion                  int     `nebulaproperty:"dynasty_opinion" description:"家族评价" nebulaindexes:"dynasty_opinion" json:"dynasty_opinion,omitempty"`
 	RulerDesignerCost               int     `nebulaproperty:"ruler_designer_cost" description:"ruler_designer_cost" nebulaindexes:"ruler_designer_cost" json:"ruler_designer_cost,omitempty"`
 	Birth                           int     `nebulaproperty:"birth" description:"birth" nebulaindexes:"birth" json:"birth,omitempty"`
 	BothParentHasTraitInheritChance int     `nebulaproperty:"both_parent_has_trait_inherit_chance" description:"both_parent_has_trait_inherit_chance" nebulaindexes:"both_parent_has_trait_inherit_chance" json:"both_parent_has_trait_inherit_chance,omitempty"`
@@ -228,7 +228,67 @@ func GetTraitById(space *nebulagolang.Space, id int) *nebulagolang.ResultT[*Trai
 }
 
 func GetAllTraits(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Trait] {
-	return nebulagolang.GetAllVertexesByQuery[*Trait](space, "")
+	tr := nebulagolang.GetAllVertexesByQuery[*Trait](space, "")
+
+	if !tr.Ok {
+		return nebulagolang.NewResultT[map[string]*Trait](tr.Result)
+	}
+
+	traits := make(map[string]*Trait)
+
+	for _, t := range tr.Data {
+		traits[t.Code] = t
+	}
+
+	return nebulagolang.NewResultTWithData[map[string]*Trait](tr.Result, traits)
+}
+
+func GetAllLeaderTraits(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Trait] {
+	tr := nebulagolang.GetAllVertexesByQuery[*Trait](space, "trait.leader==true")
+
+	if !tr.Ok {
+		return nebulagolang.NewResultT[map[string]*Trait](tr.Result)
+	}
+
+	traits := make(map[string]*Trait)
+
+	for _, t := range tr.Data {
+		traits[t.Code] = t
+	}
+
+	return nebulagolang.NewResultTWithData[map[string]*Trait](tr.Result, traits)
+}
+
+func GetAllChildHoodTraits(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Trait] {
+	tr := nebulagolang.GetAllVertexesByQuery[*Trait](space, "trait.childhood==true")
+
+	if !tr.Ok {
+		return nebulagolang.NewResultT[map[string]*Trait](tr.Result)
+	}
+
+	traits := make(map[string]*Trait)
+
+	for _, t := range tr.Data {
+		traits[t.Code] = t
+	}
+
+	return nebulagolang.NewResultTWithData[map[string]*Trait](tr.Result, traits)
+}
+
+func GetAllVirtueTraits(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Trait] {
+	tr := nebulagolang.GetAllVertexesByQuery[*Trait](space, "trait.virtue==true")
+
+	if !tr.Ok {
+		return nebulagolang.NewResultT[map[string]*Trait](tr.Result)
+	}
+
+	traits := make(map[string]*Trait)
+
+	for _, t := range tr.Data {
+		traits[t.Code] = t
+	}
+
+	return nebulagolang.NewResultTWithData[map[string]*Trait](tr.Result, traits)
 }
 
 func GetAllTraitsMap(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*Trait] {

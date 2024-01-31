@@ -7,14 +7,14 @@ import (
 type Province_Baron struct {
 	Province *Province `nebulaedgename:"province_baron" nebulaedgecomment:"Province -> Baron" nebulakey:"edgefrom" json:"from,omitempty"`
 	Baron    *Baron    `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID   int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID  int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewProvince_Baron(p *Province, b *Baron) *Province_Baron {
 	return &Province_Baron{
 		Province: p,
 		Baron:    b,
-		PlayID:   p.PlayID,
+		StoryID:  p.StoryID,
 	}
 }
 

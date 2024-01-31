@@ -5,16 +5,16 @@ import (
 )
 
 type Story_Baron struct {
-	Story  *Story `nebulaedgename:"story_baron" nebulaedgecomment:"Story -> Baron" nebulakey:"edgefrom" json:"from,omitempty"`
-	Baron  *Baron `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	Story   *Story `nebulaedgename:"story_baron" nebulaedgecomment:"Story -> Baron" nebulakey:"edgefrom" json:"from,omitempty"`
+	Baron   *Baron `nebulakey:"edgeto" json:"to,omitempty"`
+	StoryID int    `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewStory_Baron(s *Story, b *Baron) *Story_Baron {
 	return &Story_Baron{
-		Story:  s,
-		Baron:  b,
-		PlayID: s.PlayID,
+		Story:   s,
+		Baron:   b,
+		StoryID: s.StoryId,
 	}
 }
 

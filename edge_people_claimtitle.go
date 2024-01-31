@@ -9,14 +9,14 @@ type People_ClaimTitle struct {
 	ClaimTitle *Title  `nebulakey:"edgeto" json:"to,omitempty"`
 	Pressed    bool    `nebulaproperty:"pressed" description:"pressed" nebulaindexes:"pressed" json:"pressed,omitempty"`
 	Weak       bool    `nebulaproperty:"weak" description:"weak" nebulaindexes:"weak" json:"weak,omitempty"`
-	PlayID     int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID    int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_ClaimTitle(p *People, ct *Title) *People_ClaimTitle {
 	return &People_ClaimTitle{
 		People:     p,
 		ClaimTitle: ct,
-		PlayID:     p.PlayID,
+		StoryID:    p.StoryID,
 	}
 }
 

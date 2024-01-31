@@ -16,21 +16,21 @@ type Baron struct {
 	BuiltDate    time.Time `mappingalias:"Date" nebulaproperty:"built_date" nebulatype:"Date" description:"end build date" nebulaindexes:"built_date" json:"built_date,omitempty"`
 	BuildingDate time.Time `mappingalias:"BuildTime" nebulaproperty:"building_date" nebulatype:"Date" description:"start build date" nebulaindexes:"building_time" json:"building_time,omitempty"`
 	Leader       int       `nebulaproperty:"leader" description:"leader" nebulaindexes:"leader" json:"leader,omitempty"`
-	PlayID       int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID      int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
-func NewBaron(playId int, code string) *Baron {
+func NewBaron(storyId int, code string) *Baron {
 	nebulaBaron := Baron{
-		VID:    getBaronVid(playId, code),
-		Code:   code,
-		PlayID: playId,
+		VID:     getBaronVid(storyId, code),
+		Code:    code,
+		StoryID: storyId,
 	}
 	return &nebulaBaron
 }
 
 func NewBaronByData(baron *save.Baron) *Baron {
 	nebulaBaron := utils.Mapping[Baron](baron)
-	nebulaBaron.VID = getBaronVid(nebulaBaron.PlayID, nebulaBaron.Code)
+	nebulaBaron.VID = getBaronVid(nebulaBaron.StoryID, nebulaBaron.Code)
 	return &nebulaBaron
 }
 

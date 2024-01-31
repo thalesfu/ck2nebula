@@ -7,14 +7,14 @@ import (
 type People_HostPeople struct {
 	People     *People `nebulaedgename:"people_hostpeople" nebulaedgecomment:"People -> Host People" nebulakey:"edgefrom" json:"from,omitempty"`
 	HostPeople *People `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID     int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID    int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_HostPeople(p *People, hp *People) *People_HostPeople {
 	return &People_HostPeople{
 		People:     p,
 		HostPeople: hp,
-		PlayID:     p.PlayID,
+		StoryID:    p.StoryID,
 	}
 }
 

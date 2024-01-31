@@ -5,16 +5,16 @@ import (
 )
 
 type People_Focus struct {
-	People *People    `nebulaedgename:"people_focus" nebulaedgecomment:"People -> Focus" nebulakey:"edgefrom" json:"from,omitempty"`
-	Focus  *Objective `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID int        `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	People  *People    `nebulaedgename:"people_focus" nebulaedgecomment:"People -> Focus" nebulakey:"edgefrom" json:"from,omitempty"`
+	Focus   *Objective `nebulakey:"edgeto" json:"to,omitempty"`
+	StoryID int        `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_Focus(p *People, f *Objective) *People_Focus {
 	return &People_Focus{
-		People: p,
-		Focus:  f,
-		PlayID: p.PlayID,
+		People:  p,
+		Focus:   f,
+		StoryID: p.StoryID,
 	}
 }
 

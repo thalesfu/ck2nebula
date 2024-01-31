@@ -37,21 +37,21 @@ type Province struct {
 	TechCultureFlex                float32 `nebulaproperty:"tech_culture_flex" description:"tech_culture_flex" nebulaindexes:"tech_culture_flex" json:"tech_culture_flex,omitempty"`
 	TechLegalism                   float32 `nebulaproperty:"tech_legalism" description:"tech_legalism" nebulaindexes:"tech_legalism" json:"tech_legalism,omitempty"`
 	PrimarySettlement              string  `nebulaproperty:"primary_settlement" description:"primary_settlement" nebulaindexes:"primary_settlement" json:"primary_settlement,omitempty"`
-	PlayID                         int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID                        int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
-func NewProvince(playId int, provinceId int) *Province {
+func NewProvince(storyId int, provinceId int) *Province {
 	nebulaProvince := Province{
-		VID:    getProvinceVid(playId, provinceId),
-		ID:     provinceId,
-		PlayID: playId,
+		VID:     getProvinceVid(storyId, provinceId),
+		ID:      provinceId,
+		StoryID: storyId,
 	}
 	return &nebulaProvince
 }
 
 func NewProvinceByData(province *save.Province) *Province {
 	nebulaProvince := utils.Mapping[Province](province)
-	nebulaProvince.VID = getProvinceVid(nebulaProvince.PlayID, nebulaProvince.ID)
+	nebulaProvince.VID = getProvinceVid(nebulaProvince.StoryID, nebulaProvince.ID)
 
 	if province.Technology != nil && len(province.Technology.TechLevels) > 0 {
 		for i, v := range province.Technology.TechLevels {

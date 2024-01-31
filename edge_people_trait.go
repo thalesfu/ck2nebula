@@ -5,16 +5,16 @@ import (
 )
 
 type People_Trait struct {
-	People *People `nebulaedgename:"people_trait" nebulaedgecomment:"People -> Trait" nebulakey:"edgefrom" json:"from,omitempty"`
-	Trait  *Trait  `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	People  *People `nebulaedgename:"people_trait" nebulaedgecomment:"People -> Trait" nebulakey:"edgefrom" json:"from,omitempty"`
+	Trait   *Trait  `nebulakey:"edgeto" json:"to,omitempty"`
+	StoryID int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_Trait(p *People, t *Trait) *People_Trait {
 	return &People_Trait{
-		People: p,
-		Trait:  t,
-		PlayID: p.PlayID,
+		People:  p,
+		Trait:   t,
+		StoryID: p.StoryID,
 	}
 }
 

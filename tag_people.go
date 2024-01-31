@@ -56,21 +56,21 @@ type People struct {
 	Wealth               float32   `nebulaproperty:"wealth" description:"wealth" nebulaindexes:"wealth" json:"wealth,omitempty"`
 	Score                float32   `nebulaproperty:"score" description:"score" nebulaindexes:"score" json:"score,omitempty"`
 	Society              int       `nebulaproperty:"society" description:"society" nebulaindexes:"society" json:"society,omitempty"`
-	PlayID               int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID              int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
-func NewPeople(playId int, peopleId int) *People {
+func NewPeople(storyId int, peopleId int) *People {
 	nebulaPeople := People{
-		VID:    getPeopleVid(playId, peopleId),
-		ID:     peopleId,
-		PlayID: playId,
+		VID:     getPeopleVid(storyId, peopleId),
+		ID:      peopleId,
+		StoryID: storyId,
 	}
 	return &nebulaPeople
 }
 
 func NewPeopleByData(character *save.Character) *People {
 	nebulaPeople := utils.Mapping[People](character)
-	nebulaPeople.VID = getPeopleVid(nebulaPeople.PlayID, nebulaPeople.ID)
+	nebulaPeople.VID = getPeopleVid(nebulaPeople.StoryID, nebulaPeople.ID)
 	if len(character.Attributes) > 0 {
 		for i, attr := range character.Attributes {
 			switch i {
@@ -133,6 +133,131 @@ func (p *People) DeleteFromNebulaWithEdge(space *nebulagolang.Space) *nebulagola
 
 func (p *People) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Result {
 	return nebulagolang.LoadVertex(space, p)
+}
+
+func (p *People) GetFamilies(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetBrothersAndSisters(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	commands := []string{
+		fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" or people_familypeople.relation==\"mother\" yield $$ as v", p.VID),
+		"yield id($-.v) as vid",
+		"go from $-.vid over people_familypeople where people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\" yield $$ as v",
+		fmt.Sprintf("yield $-.v as v where id($-.v)!=\"%s\"", p.VID),
+	}
+
+	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
+}
+
+func (p *People) GetRealMother(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"mother\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetRealDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_daughter\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"daughter\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetRealSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_son\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"son\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetRealFather(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_father\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetFather(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetConsortOf(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort_of\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetConsorts(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetSpouses(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"spouse\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetVassals(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_empirepeople reversely yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetFriends(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_relatepeople where people_relatepeople.code==\"opinion_friend\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) getPeopleByQuery(space *nebulagolang.Space, command string) *nebulagolang.ResultT[map[int]*People] {
+	r := nebulagolang.QueryVertexesByQueryToSlice[*People](space, command)
+
+	if !r.Ok {
+		return nebulagolang.NewResultT[map[int]*People](r.Result)
+	}
+
+	result := make(map[int]*People)
+
+	for _, f := range r.Data {
+		result[f.ID] = f
+	}
+
+	return nebulagolang.NewResultTWithData(r.Result, result)
+}
+
+func (p *People) GetTraits(space *nebulagolang.Space) *nebulagolang.ResultT[map[string]*Trait] {
+	tr := nebulagolang.QueryVertexesByQueryToSlice[*Trait](space, fmt.Sprintf("go from \"%s\" over people_trait yield $$ as v", p.VID))
+
+	if !tr.Ok {
+		return nebulagolang.NewResultT[map[string]*Trait](tr.Result)
+	}
+
+	result := make(map[string]*Trait)
+
+	for _, t := range tr.Data {
+		result[t.Code] = t
+	}
+
+	return nebulagolang.NewResultTWithData(tr.Result, result)
+}
+
+func (p *People) GetEductionTraits(space *nebulagolang.Space) *nebulagolang.ResultT[[]*Trait] {
+	return nebulagolang.QueryVertexesByQueryToSlice[*Trait](space, fmt.Sprintf("go from \"%s\" over people_trait where properties($$).education==true yield $$ as v", p.VID))
 }
 
 func InsertPeoples(space *nebulagolang.Space, ps ...*People) *nebulagolang.Result {

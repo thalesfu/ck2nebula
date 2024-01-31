@@ -7,14 +7,14 @@ import (
 type People_Culture struct {
 	People  *People  `nebulaedgename:"people_culture" nebulaedgecomment:"People -> Culture" nebulakey:"edgefrom" json:"from,omitempty"`
 	Culture *Culture `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID  int      `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID int      `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_Culture(p *People, c *Culture) *People_Culture {
 	return &People_Culture{
 		People:  p,
 		Culture: c,
-		PlayID:  p.PlayID,
+		StoryID: p.StoryID,
 	}
 }
 

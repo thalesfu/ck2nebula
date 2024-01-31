@@ -7,14 +7,14 @@ import (
 type People_EmpirePeople struct {
 	People       *People `nebulaedgename:"people_empirepeople" nebulaedgecomment:"People -> Empire People" nebulakey:"edgefrom" json:"from,omitempty"`
 	EmpirePeople *People `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID       int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID      int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_EmpirePeople(p *People, ep *People) *People_EmpirePeople {
 	return &People_EmpirePeople{
 		People:       p,
 		EmpirePeople: ep,
-		PlayID:       p.PlayID,
+		StoryID:      p.StoryID,
 	}
 }
 

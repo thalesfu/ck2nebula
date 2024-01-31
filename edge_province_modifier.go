@@ -10,14 +10,14 @@ type Province_Modifier struct {
 	Modifier *Modifier `nebulakey:"edgeto" json:"to,omitempty"`
 	Abate    time.Time `nebulaproperty:"abate" nebulatype:"Date"  description:"abate date" nebulaindexes:"abate" json:"abate,omitempty"`
 	Hidden   bool      `nebulaproperty:"hidden" description:"hidden" nebulaindexes:"hidden" json:"hidden,omitempty"`
-	PlayID   int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID  int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewProvince_Modifier(p *Province, m *Modifier) *Province_Modifier {
 	return &Province_Modifier{
 		Province: p,
 		Modifier: m,
-		PlayID:   p.PlayID,
+		StoryID:  p.StoryID,
 	}
 }
 

@@ -8,14 +8,14 @@ type People_FamilyPeople struct {
 	People       *People `nebulaedgename:"people_familypeople" nebulaedgecomment:"People -> Family People" nebulakey:"edgefrom" json:"from,omitempty"`
 	FamilyPeople *People `nebulakey:"edgeto" json:"to,omitempty"`
 	Relation     string  `nebulaproperty:"relation" description:"relation" nebulaindexes:"relation" json:"relation,omitempty"`
-	PlayID       int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID      int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_FamilyPeople(p *People, fp *People) *People_FamilyPeople {
 	return &People_FamilyPeople{
 		People:       p,
 		FamilyPeople: fp,
-		PlayID:       p.PlayID,
+		StoryID:      p.StoryID,
 	}
 }
 

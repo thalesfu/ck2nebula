@@ -13,14 +13,14 @@ type People_RelatePeople struct {
 	Name         string    `nebulaproperty:"name" description:"name" nebulaindexes:"name" json:"name,omitempty"`
 	Due          time.Time `nebulaproperty:"due" nebulatype:"Date" description:"due" nebulaindexes:"due" json:"due,omitempty"`
 	Detail       string    `nebulaproperty:"detail" description:"detail" nebulaindexes:"detail" json:"detail,omitempty"`
-	PlayID       int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID      int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_RelatePeople(p *People, rp *People) *People_RelatePeople {
 	return &People_RelatePeople{
 		People:       p,
 		RelatePeople: rp,
-		PlayID:       p.PlayID,
+		StoryID:      p.StoryID,
 	}
 }
 

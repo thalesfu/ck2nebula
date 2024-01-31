@@ -8,14 +8,14 @@ type Title_AssimilatingLiegeTitle struct {
 	Title                  *Title `nebulaedgename:"title_liegeassimilatingtitle" nebulaedgecomment:"Title -> Assimilating Dejure Liege Title" nebulakey:"edgefrom" json:"from,omitempty"`
 	AssimilatingLiegeTitle *Title `nebulakey:"edgeto" json:"to,omitempty"`
 	DeJureAssYears         int    `nebulaproperty:"de_jure_ass_years" description:"assimilating dejure liege years" nebulaindexes:"de_jure_ass_years" json:"de_jure_ass_years,omitempty"`
-	PlayID                 int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID                int    `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewTitle_AssimilatingLiegeTitle(t *Title, alt *Title) *Title_AssimilatingLiegeTitle {
 	return &Title_AssimilatingLiegeTitle{
 		Title:                  t,
 		AssimilatingLiegeTitle: alt,
-		PlayID:                 t.PlayID,
+		StoryID:                t.StoryID,
 	}
 }
 

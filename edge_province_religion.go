@@ -7,14 +7,14 @@ import (
 type Province_Religion struct {
 	Province *Province `nebulaedgename:"province_religion" nebulaedgecomment:"Province -> Religion" nebulakey:"edgefrom" json:"from,omitempty"`
 	Religion *Religion `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID   int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID  int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewProvince_Religion(p *Province, r *Religion) *Province_Religion {
 	return &Province_Religion{
 		Province: p,
 		Religion: r,
-		PlayID:   p.PlayID,
+		StoryID:  p.StoryID,
 	}
 }
 

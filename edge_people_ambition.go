@@ -7,14 +7,14 @@ import (
 type People_Ambition struct {
 	People   *People    `nebulaedgename:"people_ambition" nebulaedgecomment:"People -> Ambition" nebulakey:"edgefrom" json:"from,omitempty"`
 	Ambition *Objective `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID   int        `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID  int        `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_Ambition(p *People, a *Objective) *People_Ambition {
 	return &People_Ambition{
 		People:   p,
 		Ambition: a,
-		PlayID:   p.PlayID,
+		StoryID:  p.StoryID,
 	}
 }
 

@@ -7,14 +7,14 @@ import (
 type Baron_Building struct {
 	Baron    *Baron    `nebulaedgename:"baron_building" nebulaedgecomment:"Baron -> Building" nebulakey:"edgefrom" json:"from,omitempty"`
 	Building *Building `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID   int       `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID  int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewBaron_Building(baron *Baron, building *Building) *Baron_Building {
 	return &Baron_Building{
 		Baron:    baron,
 		Building: building,
-		PlayID:   baron.PlayID,
+		StoryID:  baron.StoryID,
 	}
 }
 

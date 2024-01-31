@@ -5,16 +5,16 @@ import (
 )
 
 type Title_People struct {
-	Title  *Title  `nebulaedgename:"title_people" nebulaedgecomment:"Title -> People" nebulakey:"edgefrom" json:"from,omitempty"`
-	People *People `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	Title   *Title  `nebulaedgename:"title_people" nebulaedgecomment:"Title -> People" nebulakey:"edgefrom" json:"from,omitempty"`
+	People  *People `nebulakey:"edgeto" json:"to,omitempty"`
+	StoryID int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewTitle_People(t *Title, d *People) *Title_People {
 	return &Title_People{
-		Title:  t,
-		People: d,
-		PlayID: t.PlayID,
+		Title:   t,
+		People:  d,
+		StoryID: t.StoryID,
 	}
 }
 

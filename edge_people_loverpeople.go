@@ -7,14 +7,14 @@ import (
 type People_LoverPeople struct {
 	People      *People `nebulaedgename:"people_loverpeople" nebulaedgecomment:"People -> Lover People" nebulakey:"edgefrom" json:"from,omitempty"`
 	LoverPeople *People `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID      int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID     int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_LoverPeople(p *People, lp *People) *People_LoverPeople {
 	return &People_LoverPeople{
 		People:      p,
 		LoverPeople: lp,
-		PlayID:      p.PlayID,
+		StoryID:     p.StoryID,
 	}
 }
 

@@ -54,6 +54,7 @@ type StoryDetail struct {
 	People_Guardians              []*People_GuardianPeople
 	People_Ambtions               []*People_Ambition
 	People_Focuses                []*People_Focus
+	Story_Player                  []*Story_Player
 }
 
 type StoryUpdateDetail struct {
@@ -100,6 +101,7 @@ type StoryUpdateDetail struct {
 	People_Guardians              *nebulagolang.CompareResult[*People_GuardianPeople]
 	People_Ambtions               *nebulagolang.CompareResult[*People_Ambition]
 	People_Focuses                *nebulagolang.CompareResult[*People_Focus]
+	Story_Player                  *nebulagolang.CompareResult[*Story_Player]
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
@@ -221,6 +223,8 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 	sd.Story.CultureName = cm[sd.Story.Culture]
 	sd.Story.ReligionName = rm[sd.Story.Religion]
 
+	sd.Story_Player = append(sd.Story_Player, NewStory_Player(sd.Story, NewPeople(sd.Story.StoryId, sd.Story.PlayerID)))
+
 	for _, title := range titles {
 		sd.Story_Titles = append(sd.Story_Titles, NewStory_Title(sd.Story, title))
 	}
@@ -262,7 +266,7 @@ func getPlayIdAndPropertiesQuery[T interface{}](playId int, propertiesNamesAndVa
 	}
 
 	if len(propertiesNamesAndValues) == 0 {
-		return fmt.Sprintf("%s.play_id==%d", itemName, playId)
+		return fmt.Sprintf("%s.story_id==%d", itemName, playId)
 	}
 
 	pnvs := make([]string, len(propertiesNamesAndValues))
@@ -272,7 +276,7 @@ func getPlayIdAndPropertiesQuery[T interface{}](playId int, propertiesNamesAndVa
 		i++
 	}
 
-	return fmt.Sprintf("%s.play_id==%d%s", itemName, playId, strings.Join(pnvs, ""))
+	return fmt.Sprintf("%s.story_id==%d%s", itemName, playId, strings.Join(pnvs, ""))
 }
 
 func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebulagolang.Result) {
@@ -284,7 +288,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result := &StoryUpdateDetail{}
 
-	usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.PlayID))
+	usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.StoryId))
 
 	if !usr.Ok {
 		return result, usr
@@ -292,7 +296,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story = csr
 
-	utr, ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Titles, getPlayIdQuery[Title](s.Story.PlayID))
+	utr, ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Titles, getPlayIdQuery[Title](s.Story.StoryId))
 
 	if !utr.Ok {
 		return result, utr
@@ -300,7 +304,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Titles = ctr
 
-	utbtr, ctbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.PlayID))
+	utbtr, ctbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.StoryId))
 
 	if !utbtr.Ok {
 		return result, utbtr
@@ -308,7 +312,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_BaseTitles = ctbtr
 
-	utltr, ctltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.PlayID))
+	utltr, ctltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.StoryId))
 
 	if !utltr.Ok {
 		return result, utltr
@@ -316,7 +320,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_LiegeTitles = ctltr
 
-	utdltr, ctdltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.PlayID))
+	utdltr, ctdltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.StoryId))
 
 	if !utdltr.Ok {
 		return result, utdltr
@@ -324,7 +328,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_DejureLiegeTitles = ctdltr
 
-	utaltr, ctaltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.PlayID))
+	utaltr, ctaltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.StoryId))
 
 	if !utaltr.Ok {
 		return result, utaltr
@@ -332,7 +336,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_AssimilatingLiegeTitles = ctaltr
 
-	utdr, ctdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.PlayID))
+	utdr, ctdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.StoryId))
 
 	if !utdr.Ok {
 		return result, utdr
@@ -340,7 +344,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_Dynasties = ctdr
 
-	utp, ctp := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_People, getPlayIdQuery[Title_People](s.Story.PlayID))
+	utp, ctp := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_People, getPlayIdQuery[Title_People](s.Story.StoryId))
 
 	if !utp.Ok {
 		return result, utp
@@ -348,7 +352,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Title_People = ctp
 
-	ustr, cstr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.PlayID))
+	ustr, cstr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.StoryId))
 
 	if !ustr.Ok {
 		return result, ustr
@@ -356,7 +360,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Titles = cstr
 
-	upr, cpr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Provinces, getPlayIdQuery[Province](s.Story.PlayID))
+	upr, cpr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Provinces, getPlayIdQuery[Province](s.Story.StoryId))
 
 	if !upr.Ok {
 		return result, upr
@@ -364,7 +368,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Provinces = cpr
 
-	uspr, cspr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.PlayID))
+	uspr, cspr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.StoryId))
 
 	if !uspr.Ok {
 		return result, uspr
@@ -372,7 +376,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Provinces = cspr
 
-	upmr, cpmr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.PlayID))
+	upmr, cpmr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.StoryId))
 
 	if !upmr.Ok {
 		return result, upmr
@@ -380,7 +384,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Modifiers = cpmr
 
-	upcr, cpcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.PlayID))
+	upcr, cpcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.StoryId))
 
 	if !upcr.Ok {
 		return result, upcr
@@ -388,7 +392,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Cultures = cpcr
 
-	uprr, cprr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.PlayID))
+	uprr, cprr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.StoryId))
 
 	if !uprr.Ok {
 		return result, uprr
@@ -396,7 +400,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Religions = cprr
 
-	uptr, cptr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.PlayID))
+	uptr, cptr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.StoryId))
 
 	if !uptr.Ok {
 		return result, uptr
@@ -404,7 +408,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Titles = cptr
 
-	ubr, cbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Barons, getPlayIdQuery[Baron](s.Story.PlayID))
+	ubr, cbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Barons, getPlayIdQuery[Baron](s.Story.StoryId))
 
 	if !ubr.Ok {
 		return result, ubr
@@ -412,7 +416,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Barons = cbr
 
-	upbr, cpbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.PlayID))
+	upbr, cpbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.StoryId))
 
 	if !upbr.Ok {
 		return result, upbr
@@ -420,7 +424,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Province_Barons = cpbr
 
-	ubbr, cbbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.PlayID))
+	ubbr, cbbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.StoryId))
 
 	if !ubbr.Ok {
 		return result, ubbr
@@ -428,7 +432,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Baron_Buildings = cbbr
 
-	ubtr, cbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.PlayID))
+	ubtr, cbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.StoryId))
 
 	if !ubtr.Ok {
 		return result, ubtr
@@ -436,7 +440,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Baron_Titles = cbtr
 
-	usb, csb := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.PlayID))
+	usb, csb := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.StoryId))
 
 	if !usb.Ok {
 		return result, usb
@@ -444,7 +448,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Barons = csb
 
-	udr, cdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.PlayID))
+	udr, cdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.StoryId))
 
 	if !udr.Ok {
 		return result, udr
@@ -452,7 +456,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Dynasties = cdr
 
-	udcr, cdcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.PlayID))
+	udcr, cdcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.StoryId))
 
 	if !udcr.Ok {
 		return result, udcr
@@ -460,7 +464,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Dynasty_Cultures = cdcr
 
-	udrr, cdrr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.PlayID))
+	udrr, cdrr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId))
 
 	if !udrr.Ok {
 		return result, udrr
@@ -468,7 +472,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Dynasty_Religions = cdrr
 
-	usdr, csdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.PlayID))
+	usdr, csdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId))
 
 	if !usdr.Ok {
 		return result, usdr
@@ -476,7 +480,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_Dynasties = csdr
 
-	upeopler, cpeopler := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People, getPlayIdQuery[People](s.Story.PlayID))
+	upeopler, cpeopler := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People, getPlayIdQuery[People](s.Story.StoryId))
 
 	if !upeopler.Ok {
 		return result, upeopler
@@ -484,7 +488,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People = cpeopler
 
-	upeople_cr, cpeople_cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.PlayID))
+	upeople_cr, cpeople_cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId))
 
 	if !upeople_cr.Ok {
 		return result, upeople_cr
@@ -492,7 +496,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Cultures = cpeople_cr
 
-	upeople_gfxcr, cpeople_gfxcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.PlayID))
+	upeople_gfxcr, cpeople_gfxcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId))
 
 	if !upeople_gfxcr.Ok {
 		return result, upeople_gfxcr
@@ -500,7 +504,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_GFXCultures = cpeople_gfxcr
 
-	upeople_rr, cpeople_rr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.PlayID))
+	upeople_rr, cpeople_rr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.StoryId))
 
 	if !upeople_rr.Ok {
 		return result, upeople_rr
@@ -508,7 +512,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Religions = cpeople_rr
 
-	upeople_srr, cpeople_srr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.PlayID))
+	upeople_srr, cpeople_srr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.StoryId))
 
 	if !upeople_srr.Ok {
 		return result, upeople_srr
@@ -516,7 +520,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_SecretReligions = cpeople_srr
 
-	u_story_people_r, c_story_people_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_People, getPlayIdQuery[Story_People](s.Story.PlayID))
+	u_story_people_r, c_story_people_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId))
 
 	if !u_story_people_r.Ok {
 		return result, u_story_people_r
@@ -524,7 +528,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.Story_People = c_story_people_r
 
-	upeople_tr, cpeople_tr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.PlayID))
+	upeople_tr, cpeople_tr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.StoryId))
 
 	if !upeople_tr.Ok {
 		return result, upeople_tr
@@ -532,7 +536,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Traits = cpeople_tr
 
-	upeople_mr, cpeople_mr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.PlayID))
+	upeople_mr, cpeople_mr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.StoryId))
 
 	if !upeople_mr.Ok {
 		return result, upeople_mr
@@ -540,7 +544,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Modifiers = cpeople_mr
 
-	upeople_ctr, cpeople_ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.PlayID))
+	upeople_ctr, cpeople_ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.StoryId))
 
 	if !upeople_ctr.Ok {
 		return result, upeople_ctr
@@ -548,7 +552,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_ClaimTitles = cpeople_ctr
 
-	upeople_dr, cpeople_dr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.PlayID))
+	upeople_dr, cpeople_dr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.StoryId))
 
 	if !upeople_dr.Ok {
 		return result, upeople_dr
@@ -556,7 +560,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Dynasties = cpeople_dr
 
-	upeople_fr, cpeople_fr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.PlayID))
+	upeople_fr, cpeople_fr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.StoryId))
 
 	if !upeople_fr.Ok {
 		return result, upeople_fr
@@ -564,7 +568,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Families = cpeople_fr
 
-	upeople_hr, cpeople_hr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.PlayID))
+	upeople_hr, cpeople_hr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.StoryId))
 
 	if !upeople_hr.Ok {
 		return result, upeople_hr
@@ -572,7 +576,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Hosts = cpeople_hr
 
-	upeople_er, cpeople_er := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.PlayID))
+	upeople_er, cpeople_er := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.StoryId))
 
 	if !upeople_er.Ok {
 		return result, upeople_er
@@ -580,7 +584,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Empires = cpeople_er
 
-	upeople_kr, cpeople_kr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.PlayID))
+	upeople_kr, cpeople_kr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.StoryId))
 
 	if !upeople_kr.Ok {
 		return result, upeople_kr
@@ -588,7 +592,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Killers = cpeople_kr
 
-	upeople_relarte_r, cpeople_r_relate_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.PlayID))
+	upeople_relarte_r, cpeople_r_relate_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId))
 
 	if !upeople_relarte_r.Ok {
 		return result, upeople_relarte_r
@@ -596,7 +600,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Relates = cpeople_r_relate_r
 
-	upeople_lr, cpeople_lr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.PlayID))
+	upeople_lr, cpeople_lr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.StoryId))
 
 	if !upeople_lr.Ok {
 		return result, upeople_lr
@@ -604,7 +608,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Lovers = cpeople_lr
 
-	upeople_gr, cpeople_gr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.PlayID))
+	upeople_gr, cpeople_gr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.StoryId))
 
 	if !upeople_gr.Ok {
 		return result, upeople_gr
@@ -612,7 +616,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Guardians = cpeople_gr
 
-	upeople_ar, cpeople_ar := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.PlayID))
+	upeople_ar, cpeople_ar := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.StoryId))
 
 	if !upeople_ar.Ok {
 		return result, upeople_ar
@@ -620,13 +624,21 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result.People_Ambtions = cpeople_ar
 
-	u_people_focuses_r, c_people_focuses_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.PlayID))
+	u_people_focuses_r, c_people_focuses_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.StoryId))
 
 	if !u_people_focuses_r.Ok {
 		return result, u_people_focuses_r
 	}
 
 	result.People_Focuses = c_people_focuses_r
+
+	u_story_player_r, c_story_player_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId))
+
+	if !u_story_player_r.Ok {
+		return result, u_story_player_r
+	}
+
+	result.Story_Player = c_story_player_r
 
 	return result, ustr
 }
@@ -809,11 +821,15 @@ func BuildStory(path string, savePath string) {
 		fmt.Println("People_Focus updated:", len(story.People_Focuses.Updated))
 		fmt.Println("People_Focus deleted:", len(story.People_Focuses.Deleted))
 		fmt.Println("People_Focus kept:", len(story.People_Focuses.Kept))
+		fmt.Println("Story_Player added:", len(story.Story_Player.Added))
+		fmt.Println("Story_Player updated:", len(story.Story_Player.Updated))
+		fmt.Println("Story_Player deleted:", len(story.Story_Player.Deleted))
+		fmt.Println("Story_Player kept:", len(story.Story_Player.Kept))
 	}
 }
 
 func DeleteStoryData(playId int) *nebulagolang.Result {
-	r := DeleteAllStory_TitlesByPlayId(SPACE, playId)
+	r := DeleteAllStory_PlayerByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r
@@ -1018,6 +1034,12 @@ func DeleteStoryData(playId int) *nebulagolang.Result {
 	}
 
 	r = DeleteAllTitle_BaseTitlesByPlayId(SPACE, playId)
+
+	if !r.Ok {
+		return r
+	}
+
+	r = DeleteAllStory_TitlesByPlayId(SPACE, playId)
 
 	if !r.Ok {
 		return r

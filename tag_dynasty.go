@@ -15,21 +15,21 @@ type Dynasty struct {
 	Religion           string `nebulaproperty:"religion" description:"religion" nebulaindexes:"religion" json:"religion,omitempty"`
 	CoatOfArmsData     string `nebulaproperty:"coat_of_arms_data" description:"coat_of_arms_data" nebulaindexes:"coat_of_arms_data" json:"coat_of_arms_data,omitempty"`
 	CoatOfArmsReligion string `nebulaproperty:"coat_of_arms_religion" description:"coat_of_arms_religion" nebulaindexes:"coat_of_arms_religion" json:"coat_of_arms_religion,omitempty"`
-	PlayID             int    `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID            int    `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
-func NewDynasty(playId int, dynastyId int) *Dynasty {
+func NewDynasty(storyId int, dynastyId int) *Dynasty {
 	nebulaDynasty := Dynasty{
-		VID:    getDynastyVid(playId, dynastyId),
-		ID:     dynastyId,
-		PlayID: playId,
+		VID:     getDynastyVid(storyId, dynastyId),
+		ID:      dynastyId,
+		StoryID: storyId,
 	}
 	return &nebulaDynasty
 }
 
 func NewDynastyByData(dynasty *save.Dynasty) *Dynasty {
 	nebulaDynasty := utils.Mapping[Dynasty](dynasty)
-	nebulaDynasty.VID = getDynastyVid(nebulaDynasty.PlayID, nebulaDynasty.ID)
+	nebulaDynasty.VID = getDynastyVid(nebulaDynasty.StoryID, nebulaDynasty.ID)
 
 	if dynasty.CoatOfArms != nil {
 		if len(dynasty.CoatOfArms.Data) > 0 {

@@ -7,14 +7,14 @@ import (
 type People_KillPeople struct {
 	People     *People `nebulaedgename:"people_killpeople" nebulaedgecomment:"People -> Kill People" nebulakey:"edgefrom" json:"from,omitempty"`
 	KillPeople *People `nebulakey:"edgeto" json:"to,omitempty"`
-	PlayID     int     `nebulaproperty:"play_id" description:"game play id" nebulaindexes:"play_id" json:"play_id,omitempty"`
+	StoryID    int     `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
 }
 
 func NewPeople_KillPeople(p *People, kp *People) *People_KillPeople {
 	return &People_KillPeople{
 		People:     p,
 		KillPeople: kp,
-		PlayID:     p.PlayID,
+		StoryID:    p.StoryID,
 	}
 }
 
