@@ -14,6 +14,7 @@ type Title struct {
 	Foa                string `nebulaproperty:"foa" description:"title foa" nebulaindexes:"foa" son:"foa,omitempty"`
 	Title              string `nebulaproperty:"title" description:"title" nebulaindexes:"title" json:"title,omitempty"`
 	TitleFemale        string `nebulaproperty:"title_female" description:"female title" nebulaindexes:"title_female" json:"title_female,omitempty"`
+	TitleLevel         string `nebulaproperty:"title_level" description:"title level" nebulaindexes:"title_level" json:"title_level,omitempty"`
 	Gender             string `nebulaproperty:"gender" description:"title gender" nebulaindexes:"gender" json:"gender,omitempty"`
 	Active             bool   `nebulaproperty:"active" description:"title is active" nebulaindexes:"active" json:"active,omitempty"`
 	IsCustom           bool   `nebulaproperty:"is_custom" description:"is custom title" nebulaindexes:"is_custom" json:"is_custom,omitempty"`
@@ -53,6 +54,8 @@ func NewTitleByData(title *save.Title) *Title {
 
 		nebulaTitle.CoatOfArmsReligion = title.CoatOfArms.Religion
 	}
+
+	nebulaTitle.TitleLevel = string(title.ID[0])
 
 	return &nebulaTitle
 }

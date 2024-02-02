@@ -1,5 +1,10 @@
 package main
 
+import (
+	"github.com/thalesfu/ck2nebula"
+	"github.com/thalesfu/nebulagolang/build"
+)
+
 func main() {
 
 	//build.RebuildTagWithIndexes[ck2nebula.CultureGroup](ck2nebula.SPACE)
@@ -49,7 +54,7 @@ func main() {
 
 	//build.RebuildTagWithIndexes[ck2nebula.Objective](ck2nebula.SPACE)
 
-	//build.RebuildTagWithIndexes[ck2nebula.People](ck2nebula.SPACE)
+	build.RebuildTagWithIndexes[ck2nebula.People](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.People_Culture](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.People_GFXCulture](ck2nebula.SPACE)
 	//build.RebuildEdgeWithIndexes[ck2nebula.People_Religion](ck2nebula.SPACE)

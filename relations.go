@@ -15,16 +15,30 @@ func GenerateRelations(file *save.SaveFile, translations map[string]string) []*P
 		return []*People_RelatePeople{}
 	}
 
+	pairs := make(map[*save.Character]map[*save.Character][]*save.PersonRelation)
+
 	relations := make([]*People_RelatePeople, 0)
 
 	for k, rd := range file.Relations {
-		srcString := strings.TrimPrefix(k, "rel_")
+		var srcString string
+		if strings.HasPrefix(k, "rel_") {
+			srcString = strings.TrimPrefix(k, "rel_")
+		} else if strings.HasPrefix(k, "diplo_") {
+			srcString = strings.TrimPrefix(k, "diplo_")
+		}
 		srcId, err := strconv.Atoi(srcString)
 		if err != nil {
 			continue
 		}
 
 		src := file.Characters[srcId]
+
+		srcpart, ok := pairs[src]
+
+		if !ok {
+			srcpart = make(map[*save.Character][]*save.PersonRelation)
+			pairs[src] = srcpart
+		}
 
 		for dstString, rel := range rd {
 			dstId, err := strconv.Atoi(dstString)
@@ -34,119 +48,134 @@ func GenerateRelations(file *save.SaveFile, translations map[string]string) []*P
 
 			dst := file.Characters[dstId]
 
-			rs := generateRelations(src, dst, rel, translations, file)
+			dstpart, ok := srcpart[dst]
 
-			relations = append(relations, rs...)
+			if !ok {
+				dstpart = make([]*save.PersonRelation, 0)
+				srcpart[dst] = dstpart
+			}
+
+			srcpart[dst] = append(srcpart[dst], rel)
 		}
+	}
 
+	for src, srcpart := range pairs {
+		for dst, rels := range srcpart {
+			relation := generateRelations(src, dst, rels, translations, file)
+			relations = append(relations, relation...)
+		}
 	}
 
 	return relations
 }
 
-func generateRelations(src *save.Character, dst *save.Character, rel *save.PersonRelation, translations map[string]string, file *save.SaveFile) []*People_RelatePeople {
+func generateRelations(src *save.Character, dst *save.Character, rels []*save.PersonRelation, translations map[string]string, file *save.SaveFile) []*People_RelatePeople {
 	relations := make([]*People_RelatePeople, 0)
-	relv := utils.IndirectValue(reflect.ValueOf(rel))
-	relt := relv.Type()
 	rank := 0
 
-	if rel.RY != 0 {
-		relation := generateReignedYearsRelation(src, dst, rel.RY)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
+	for _, rel := range rels {
 
-	if rel.LooterHostilityDays > 0 {
-		relation := generateLooterHostilityDaysRelation(src, dst, rel.LooterHostilityDays)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
+		relv := utils.IndirectValue(reflect.ValueOf(rel))
+		relt := relv.Type()
 
-	if rel.Alliance {
-		relation := generateAllianceRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
-
-	if rel.CanCallToWar {
-		relation := generateCanCallToWarRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
-
-	if rel.DisableNonAggressionPacts {
-		relation := generateDisableNonAggressionPactsRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
-
-	if rel.IsLooter {
-		relation := generateIsLooterRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
-
-	if rel.Succession {
-		relation := generateSuccessionRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-	}
-
-	if rel.NonAggressionPact {
-		relation := generateNonAggressionPactRelation(src, dst)
-		relation.Rank = rank
-		relations = append(relations, relation)
-		rank++
-
-	}
-
-	for i := 0; i < relt.NumField(); i++ {
-		ft := relt.Field(i)
-		fv := relv.Field(i)
-		ftn := utils.IndirectValue(reflect.New(ft.Type)).Type().Name()
-		var relation *People_RelatePeople
-
-		switch ftn {
-		case "CommonRelation":
-			if !fv.IsNil() {
-				cr := utils.IndirectValue(fv).Interface().(save.CommonRelation)
-				relation = generateCommonRelation(src, dst, &cr, ft.Tag.Get("paradox_field"), translations)
-			}
-		case "CasusBelli":
-			if !fv.IsNil() {
-				cb := utils.IndirectValue(fv).Interface().(save.CasusBelli)
-				relation = generateCasusBelliRelation(src, dst, &cb, ft.Tag.Get("paradox_field"), file)
-			}
-		case "Truce":
-			if !fv.IsNil() {
-				t := utils.IndirectValue(fv).Interface().(save.Truce)
-				relation = generateTruceRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
-			}
-		case "Tributary":
-			if !fv.IsNil() {
-				t := utils.IndirectValue(fv).Interface().(save.Tributary)
-				relation = generateTributaryRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
-			}
-		case "MarriageTie":
-			if !fv.IsNil() {
-				mt := utils.IndirectValue(fv).Interface().(save.MarriageTie)
-				relation = generateMarriageTieRelation(src, dst, &mt, ft.Tag.Get("paradox_field"), file)
-			}
-		}
-
-		if relation != nil {
+		if rel.RY != 0 {
+			relation := generateReignedYearsRelation(src, dst, rel.RY)
 			relation.Rank = rank
 			relations = append(relations, relation)
 			rank++
 		}
 
+		if rel.LooterHostilityDays > 0 {
+			relation := generateLooterHostilityDaysRelation(src, dst, rel.LooterHostilityDays)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.Alliance {
+			relation := generateAllianceRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.CanCallToWar {
+			relation := generateCanCallToWarRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.DisableNonAggressionPacts {
+			relation := generateDisableNonAggressionPactsRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.IsLooter {
+			relation := generateIsLooterRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.Succession {
+			relation := generateSuccessionRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+		}
+
+		if rel.NonAggressionPact {
+			relation := generateNonAggressionPactRelation(src, dst)
+			relation.Rank = rank
+			relations = append(relations, relation)
+			rank++
+
+		}
+
+		for i := 0; i < relt.NumField(); i++ {
+			ft := relt.Field(i)
+			fv := relv.Field(i)
+			ftn := utils.IndirectValue(reflect.New(ft.Type)).Type().Name()
+			var relation *People_RelatePeople
+
+			switch ftn {
+			case "CommonRelation":
+				if !fv.IsNil() {
+					cr := utils.IndirectValue(fv).Interface().(save.CommonRelation)
+					relation = generateCommonRelation(src, dst, &cr, ft.Tag.Get("paradox_field"), translations)
+				}
+			case "CasusBelli":
+				if !fv.IsNil() {
+					cb := utils.IndirectValue(fv).Interface().(save.CasusBelli)
+					relation = generateCasusBelliRelation(src, dst, &cb, ft.Tag.Get("paradox_field"), file)
+				}
+			case "Truce":
+				if !fv.IsNil() {
+					t := utils.IndirectValue(fv).Interface().(save.Truce)
+					relation = generateTruceRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
+				}
+			case "Tributary":
+				if !fv.IsNil() {
+					t := utils.IndirectValue(fv).Interface().(save.Tributary)
+					relation = generateTributaryRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
+				}
+			case "MarriageTie":
+				if !fv.IsNil() {
+					mt := utils.IndirectValue(fv).Interface().(save.MarriageTie)
+					relation = generateMarriageTieRelation(src, dst, &mt, ft.Tag.Get("paradox_field"), file)
+				}
+			}
+
+			if relation != nil {
+				relation.Rank = rank
+				relations = append(relations, relation)
+				rank++
+			}
+
+		}
 	}
 
 	return relations
@@ -327,8 +356,8 @@ func generateNonAggressionPactRelation(src *save.Character, dst *save.Character)
 func generateSuccessionRelation(src *save.Character, dst *save.Character) *People_RelatePeople {
 	relation := NewPeople_RelatePeople(NewPeopleByData(src), NewPeopleByData(dst))
 	relation.Code = "succession"
-	relation.Name = "继承"
-	relation.Detail = "继承"
+	relation.Name = "入赘"
+	relation.Detail = "入赘"
 
 	return relation
 }

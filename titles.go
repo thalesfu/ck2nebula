@@ -28,7 +28,7 @@ func GenerateTitles(titles map[string]*save.Title) (
 			if title.Liege.ID == "" && title.Liege.Title != "" {
 				title.Liege.ID = title.Liege.Title
 			}
-			tlt := NewTitle_LiegeTitle(rts[i], NewTitleByData(title.Liege))
+			tlt := NewTitle_LiegeTitle(rts[i], NewTitleByData(titles[title.Liege.ID]))
 			rtlts = append(rtlts, tlt)
 		}
 
@@ -36,7 +36,7 @@ func GenerateTitles(titles map[string]*save.Title) (
 			if title.BaseTitle.ID == "" && title.BaseTitle.Title != "" {
 				title.BaseTitle.ID = title.BaseTitle.Title
 			}
-			tbt := NewTitle_BaseTitle(rts[i], NewTitleByData(title.BaseTitle))
+			tbt := NewTitle_BaseTitle(rts[i], NewTitleByData(titles[title.BaseTitle.ID]))
 			rtbts = append(rtbts, tbt)
 		}
 
@@ -44,7 +44,7 @@ func GenerateTitles(titles map[string]*save.Title) (
 			if title.DeJureLiege.ID == "" && title.DeJureLiege.Title != "" {
 				title.DeJureLiege.ID = title.DeJureLiege.Title
 			}
-			tdlt := NewTitle_DejureLiegeTitle(rts[i], NewTitleByData(title.DeJureLiege))
+			tdlt := NewTitle_DejureLiegeTitle(rts[i], NewTitleByData(titles[title.DeJureLiege.ID]))
 			rtdlts = append(rtdlts, tdlt)
 		}
 
@@ -52,7 +52,7 @@ func GenerateTitles(titles map[string]*save.Title) (
 			if title.AssimilatingLiege.ID == "" && title.AssimilatingLiege.Title != "" {
 				title.AssimilatingLiege.ID = title.AssimilatingLiege.Title
 			}
-			talt := NewTitle_AssimilatingLiegeTitle(rts[i], NewTitleByData(title.AssimilatingLiege))
+			talt := NewTitle_AssimilatingLiegeTitle(rts[i], NewTitleByData(titles[title.AssimilatingLiege.ID]))
 			talt.DeJureAssYears = title.DeJureAssYears
 			rtalts = append(rtalts, talt)
 		}

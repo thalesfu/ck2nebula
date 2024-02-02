@@ -1,5 +1,7 @@
 package main
 
+import "github.com/thalesfu/ck2nebula"
+
 const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
 const saveFile = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\酒泉771_02_14dd.ck2"
 const saveFile2 = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\閰掓硥796_12_01.ck2"
@@ -168,7 +170,7 @@ func main() {
 	//	fmt.Println(utils.MarshalJSON(result.Data))
 	//}
 
-	//ck2nebula.DeleteStoryData(916505602)
+	ck2nebula.DeleteStoryData(916505602)
 	//ck2nebula.DeleteAllModifierWithEdges(ck2nebula.SPACE)
 	//result := ck2nebula.DeleteAllPeople_RelatePeoples(ck2nebula.SPACE)
 

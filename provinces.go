@@ -64,6 +64,10 @@ func GenerateProvinces(provinces map[int]*save.Province, cm map[string]string, r
 			}
 
 			rbts = append(rbts, NewBaron_Title(b, NewTitle(baron.PlayID, baron.Code)))
+
+			if province.PrimarySettlement == baron.Code {
+				rbts = append(rbts, NewBaron_Title(b, NewTitle(province.PlayID, rps[i].Code)))
+			}
 		}
 
 		i++
