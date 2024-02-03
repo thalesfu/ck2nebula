@@ -145,17 +145,34 @@ func (p *People) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Result 
 	return nebulagolang.LoadVertex(space, p)
 }
 
+func (p *People) GetAliveFamilies(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where properties($$).isdead==false yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
 func (p *People) GetFamilies(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	command := fmt.Sprintf("go from \"%s\" over people_familypeople yield $$ as v", p.VID)
 
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveBrothersAndSisters(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	commands := []string{
+		fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" or people_familypeople.relation==\"mother\" yield $$ as v", p.VID),
+		"yield id($-.v) as vid",
+		"go from $-.vid over people_familypeople where people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\" and properties($$).isdead==false yield $$ as v",
+		fmt.Sprintf("yield $-.v as v where id($-.v)!=\"%s\"", p.VID),
+	}
+
+	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
+}
+
 func (p *People) GetBrothersAndSisters(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	commands := []string{
 		fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" or people_familypeople.relation==\"mother\" yield $$ as v", p.VID),
 		"yield id($-.v) as vid",
-		"go from $-.vid over people_familypeople where people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\" yield $$ as v",
+		"go from $-.vid over people_familypeople where people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\" and properties($$).isdead==false yield $$ as v",
 		fmt.Sprintf("yield $-.v as v where id($-.v)!=\"%s\"", p.VID),
 	}
 
@@ -163,6 +180,15 @@ func (p *People) GetBrothersAndSisters(space *nebulagolang.Space) *nebulagolang.
 }
 
 func (p *People) GetAliveGrandSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	commands := []string{
+		fmt.Sprintf("go from \"%s\" over people_familypeople where properties(edge).relation==\"son\" or properties(edge).relation==\"real_son\" or properties(edge).relation==\"da\nughter\" or properties(edge).relation==\"real_daughter\" yield id($$) as vid", p.VID),
+		fmt.Sprintf("go from $-.vid over people_familypeople where properties(edge).relation==\"son\" and properties($$).dynasty==%d and properties($$).isdead==false yield $$ as v", p.Dynasty),
+	}
+
+	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
+}
+
+func (p *People) GetGrandSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	commands := []string{
 		fmt.Sprintf("go from \"%s\" over people_familypeople where properties(edge).relation==\"son\" or properties(edge).relation==\"real_son\" or properties(edge).relation==\"da\nughter\" or properties(edge).relation==\"real_daughter\" yield id($$) as vid", p.VID),
 		fmt.Sprintf("go from $-.vid over people_familypeople where properties(edge).relation==\"son\" and properties($$).dynasty==%d yield $$ as v", p.Dynasty),
@@ -177,8 +203,20 @@ func (p *People) GetRealMother(space *nebulagolang.Space) *nebulagolang.ResultT[
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveRealDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_daughter\" and properties($$).isdead==false yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
 func (p *People) GetRealDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_daughter\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetAliveDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"daughter\" and properties($$).isdead==false yield $$ as v", p.VID)
 
 	return p.getPeopleByQuery(space, command)
 }
@@ -189,8 +227,20 @@ func (p *People) GetDaughter(space *nebulagolang.Space) *nebulagolang.ResultT[ma
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveRealSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_son\" and properties($$).isdead==false yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
 func (p *People) GetRealSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"real_son\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetAliveSon(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"son\" and properties($$).isdead==false yield $$ as v", p.VID)
 
 	return p.getPeopleByQuery(space, command)
 }
@@ -213,14 +263,32 @@ func (p *People) GetFather(space *nebulagolang.Space) *nebulagolang.ResultT[map[
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveConsortOf(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort_of\" and properties($$).isdead==false yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
 func (p *People) GetConsortOf(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort_of\" yield $$ as v", p.VID)
 
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveConsorts(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort\" and properties($$).isdead==false yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
 func (p *People) GetConsorts(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"consort\" yield $$ as v", p.VID)
+
+	return p.getPeopleByQuery(space, command)
+}
+
+func (p *People) GetAliveSpouses(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"spouse\" and properties($$).isdead==false yield $$ as v", p.VID)
 
 	return p.getPeopleByQuery(space, command)
 }

@@ -3,11 +3,15 @@ package ck2nebula
 import (
 	"fmt"
 	"github.com/thalesfu/nebulagolang"
+	"github.com/thalesfu/nebulagolang/utils"
 	"github.com/thalesfu/paradoxtools/CK2/culture"
 	"github.com/thalesfu/paradoxtools/CK2/localisation"
 	"github.com/thalesfu/paradoxtools/CK2/religion"
 	"github.com/thalesfu/paradoxtools/CK2/save"
+	"log"
+	"reflect"
 	"strings"
+	"time"
 )
 
 type StoryDetail struct {
@@ -105,6 +109,8 @@ type StoryUpdateDetail struct {
 }
 
 func GetStory(path string, savePath string) *StoryDetail {
+	log.Println("Get story.")
+
 	s, ok, err := save.LoadSave(path, savePath)
 
 	if err != nil {
@@ -279,6 +285,13 @@ func getPlayIdAndPropertiesQuery[T interface{}](playId int, propertiesNamesAndVa
 	return fmt.Sprintf("%s.story_id==%d%s", itemName, playId, strings.Join(pnvs, ""))
 }
 
+type CUResult struct {
+	Name          string
+	UpdateResult  *nebulagolang.Result
+	CompareResult interface{}
+	StartTime     time.Time
+}
+
 func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebulagolang.Result) {
 	s := GetStory(path, savePath)
 
@@ -288,359 +301,127 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	result := &StoryUpdateDetail{}
 
-	usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.StoryId))
+	rfv := GetStoryCompareAndUpdateDetailGenericFieldReflectValue(result)
+	fields := make(map[string]bool)
 
-	if !usr.Ok {
-		return result, usr
+	chanelDeep := len(rfv)
+
+	cuResultChanel := make(chan *CUResult, chanelDeep)
+
+	go CRData(cuResultChanel, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Titles, getPlayIdQuery[Title](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Title_People, getPlayIdQuery[Title_People](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Provinces, getPlayIdQuery[Province](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Barons, getPlayIdQuery[Baron](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People, getPlayIdQuery[People](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.StoryId), fields)
+	go CRData(cuResultChanel, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId), fields)
+
+	var updateResult *nebulagolang.Result
+
+	for i := 0; i < chanelDeep; i++ {
+		cur := <-cuResultChanel
+		ur, ok := UpdateStoryCompareAndUpdateDetail(rfv, cur, fields)
+		updateResult = ur
+
+		if !ok {
+			return result, ur
+		}
+
+		if len(fields) == 0 {
+			break
+		}
+
+		left := make([]string, 0)
+		for k, _ := range fields {
+			left = append(left, k)
+		}
+
+		fmt.Printf("Left %s.\n", strings.Join(left, ", "))
 	}
 
-	result.Story = csr
+	return result, updateResult
+}
 
-	utr, ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Titles, getPlayIdQuery[Title](s.Story.StoryId))
+func CRData[T interface{}](chanel chan<- *CUResult, data []T, query string, fields map[string]bool) {
+	t := utils.GetType[T]()
+	log.Printf("Compare and update %s.\n", t.Name())
+	fields[t.Name()] = true
+	r := &CUResult{Name: t.Name(), StartTime: time.Now()}
+	usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery[T](SPACE, data, query)
+	r.UpdateResult = usr
+	r.CompareResult = csr
+	chanel <- r
+}
 
-	if !utr.Ok {
-		return result, utr
+func GetStoryCompareAndUpdateDetailGenericFieldReflectValue(detail *StoryUpdateDetail) map[reflect.Type]reflect.Value {
+	result := make(map[reflect.Type]reflect.Value)
+
+	fv := utils.IndirectValue(reflect.ValueOf(detail))
+	ft := fv.Type()
+
+	for i := 0; i < ft.NumField(); i++ {
+		f := ft.Field(i)
+		v := fv.Field(i)
+		result[f.Type] = v
 	}
 
-	result.Titles = ctr
+	return result
+}
 
-	utbtr, ctbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.StoryId))
-
-	if !utbtr.Ok {
-		return result, utbtr
+func UpdateStoryCompareAndUpdateDetail(detail map[reflect.Type]reflect.Value, result *CUResult, fields map[string]bool) (*nebulagolang.Result, bool) {
+	if !result.UpdateResult.Ok {
+		return result.UpdateResult, false
 	}
 
-	result.Title_BaseTitles = ctbtr
+	t := reflect.TypeOf(result.CompareResult)
 
-	utltr, ctltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.StoryId))
+	if v, ok := detail[t]; ok {
+		v.Set(reflect.ValueOf(result.CompareResult))
 
-	if !utltr.Ok {
-		return result, utltr
+		diff := time.Now().Sub(result.StartTime)
+
+		log.Printf("%sCompare and update %s done. Take %.0f seconds.%s\n", utils.PrintColorYellow, result.Name, diff.Seconds(), utils.PrintColorReset)
 	}
+	delete(fields, result.Name)
 
-	result.Title_LiegeTitles = ctltr
-
-	utdltr, ctdltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.StoryId))
-
-	if !utdltr.Ok {
-		return result, utdltr
-	}
-
-	result.Title_DejureLiegeTitles = ctdltr
-
-	utaltr, ctaltr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.StoryId))
-
-	if !utaltr.Ok {
-		return result, utaltr
-	}
-
-	result.Title_AssimilatingLiegeTitles = ctaltr
-
-	utdr, ctdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.StoryId))
-
-	if !utdr.Ok {
-		return result, utdr
-	}
-
-	result.Title_Dynasties = ctdr
-
-	utp, ctp := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Title_People, getPlayIdQuery[Title_People](s.Story.StoryId))
-
-	if !utp.Ok {
-		return result, utp
-	}
-
-	result.Title_People = ctp
-
-	ustr, cstr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.StoryId))
-
-	if !ustr.Ok {
-		return result, ustr
-	}
-
-	result.Story_Titles = cstr
-
-	upr, cpr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Provinces, getPlayIdQuery[Province](s.Story.StoryId))
-
-	if !upr.Ok {
-		return result, upr
-	}
-
-	result.Provinces = cpr
-
-	uspr, cspr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.StoryId))
-
-	if !uspr.Ok {
-		return result, uspr
-	}
-
-	result.Story_Provinces = cspr
-
-	upmr, cpmr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.StoryId))
-
-	if !upmr.Ok {
-		return result, upmr
-	}
-
-	result.Province_Modifiers = cpmr
-
-	upcr, cpcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.StoryId))
-
-	if !upcr.Ok {
-		return result, upcr
-	}
-
-	result.Province_Cultures = cpcr
-
-	uprr, cprr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.StoryId))
-
-	if !uprr.Ok {
-		return result, uprr
-	}
-
-	result.Province_Religions = cprr
-
-	uptr, cptr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.StoryId))
-
-	if !uptr.Ok {
-		return result, uptr
-	}
-
-	result.Province_Titles = cptr
-
-	ubr, cbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Barons, getPlayIdQuery[Baron](s.Story.StoryId))
-
-	if !ubr.Ok {
-		return result, ubr
-	}
-
-	result.Barons = cbr
-
-	upbr, cpbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.StoryId))
-
-	if !upbr.Ok {
-		return result, upbr
-	}
-
-	result.Province_Barons = cpbr
-
-	ubbr, cbbr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.StoryId))
-
-	if !ubbr.Ok {
-		return result, ubbr
-	}
-
-	result.Baron_Buildings = cbbr
-
-	ubtr, cbtr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.StoryId))
-
-	if !ubtr.Ok {
-		return result, ubtr
-	}
-
-	result.Baron_Titles = cbtr
-
-	usb, csb := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.StoryId))
-
-	if !usb.Ok {
-		return result, usb
-	}
-
-	result.Story_Barons = csb
-
-	udr, cdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.StoryId))
-
-	if !udr.Ok {
-		return result, udr
-	}
-
-	result.Dynasties = cdr
-
-	udcr, cdcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.StoryId))
-
-	if !udcr.Ok {
-		return result, udcr
-	}
-
-	result.Dynasty_Cultures = cdcr
-
-	udrr, cdrr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId))
-
-	if !udrr.Ok {
-		return result, udrr
-	}
-
-	result.Dynasty_Religions = cdrr
-
-	usdr, csdr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId))
-
-	if !usdr.Ok {
-		return result, usdr
-	}
-
-	result.Story_Dynasties = csdr
-
-	upeopler, cpeopler := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People, getPlayIdQuery[People](s.Story.StoryId))
-
-	if !upeopler.Ok {
-		return result, upeopler
-	}
-
-	result.People = cpeopler
-
-	upeople_cr, cpeople_cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId))
-
-	if !upeople_cr.Ok {
-		return result, upeople_cr
-	}
-
-	result.People_Cultures = cpeople_cr
-
-	upeople_gfxcr, cpeople_gfxcr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId))
-
-	if !upeople_gfxcr.Ok {
-		return result, upeople_gfxcr
-	}
-
-	result.People_GFXCultures = cpeople_gfxcr
-
-	upeople_rr, cpeople_rr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.StoryId))
-
-	if !upeople_rr.Ok {
-		return result, upeople_rr
-	}
-
-	result.People_Religions = cpeople_rr
-
-	upeople_srr, cpeople_srr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.StoryId))
-
-	if !upeople_srr.Ok {
-		return result, upeople_srr
-	}
-
-	result.People_SecretReligions = cpeople_srr
-
-	u_story_people_r, c_story_people_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId))
-
-	if !u_story_people_r.Ok {
-		return result, u_story_people_r
-	}
-
-	result.Story_People = c_story_people_r
-
-	upeople_tr, cpeople_tr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.StoryId))
-
-	if !upeople_tr.Ok {
-		return result, upeople_tr
-	}
-
-	result.People_Traits = cpeople_tr
-
-	upeople_mr, cpeople_mr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.StoryId))
-
-	if !upeople_mr.Ok {
-		return result, upeople_mr
-	}
-
-	result.People_Modifiers = cpeople_mr
-
-	upeople_ctr, cpeople_ctr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.StoryId))
-
-	if !upeople_ctr.Ok {
-		return result, upeople_ctr
-	}
-
-	result.People_ClaimTitles = cpeople_ctr
-
-	upeople_dr, cpeople_dr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.StoryId))
-
-	if !upeople_dr.Ok {
-		return result, upeople_dr
-	}
-
-	result.People_Dynasties = cpeople_dr
-
-	upeople_fr, cpeople_fr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.StoryId))
-
-	if !upeople_fr.Ok {
-		return result, upeople_fr
-	}
-
-	result.People_Families = cpeople_fr
-
-	upeople_hr, cpeople_hr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.StoryId))
-
-	if !upeople_hr.Ok {
-		return result, upeople_hr
-	}
-
-	result.People_Hosts = cpeople_hr
-
-	upeople_er, cpeople_er := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.StoryId))
-
-	if !upeople_er.Ok {
-		return result, upeople_er
-	}
-
-	result.People_Empires = cpeople_er
-
-	upeople_kr, cpeople_kr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.StoryId))
-
-	if !upeople_kr.Ok {
-		return result, upeople_kr
-	}
-
-	result.People_Killers = cpeople_kr
-
-	upeople_relarte_r, cpeople_r_relate_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId))
-
-	if !upeople_relarte_r.Ok {
-		return result, upeople_relarte_r
-	}
-
-	result.People_Relates = cpeople_r_relate_r
-
-	upeople_lr, cpeople_lr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.StoryId))
-
-	if !upeople_lr.Ok {
-		return result, upeople_lr
-	}
-
-	result.People_Lovers = cpeople_lr
-
-	upeople_gr, cpeople_gr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.StoryId))
-
-	if !upeople_gr.Ok {
-		return result, upeople_gr
-	}
-
-	result.People_Guardians = cpeople_gr
-
-	upeople_ar, cpeople_ar := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.StoryId))
-
-	if !upeople_ar.Ok {
-		return result, upeople_ar
-	}
-
-	result.People_Ambtions = cpeople_ar
-
-	u_people_focuses_r, c_people_focuses_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.StoryId))
-
-	if !u_people_focuses_r.Ok {
-		return result, u_people_focuses_r
-	}
-
-	result.People_Focuses = c_people_focuses_r
-
-	u_story_player_r, c_story_player_r := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId))
-
-	if !u_story_player_r.Ok {
-		return result, u_story_player_r
-	}
-
-	result.Story_Player = c_story_player_r
-
-	return result, ustr
+	return result.UpdateResult, true
 }
 
 func BuildStory(path string, savePath string) {
@@ -649,182 +430,74 @@ func BuildStory(path string, savePath string) {
 	if !result.Ok {
 		fmt.Println(result.Err)
 	} else {
-		fmt.Println("Story added:", len(story.Story.Added))
-		fmt.Println("Story updated:", len(story.Story.Updated))
-		fmt.Println("Story deleted:", len(story.Story.Deleted))
-		fmt.Println("Story kept:", len(story.Story.Kept))
-		fmt.Println("Title added:", len(story.Titles.Added))
-		fmt.Println("Title updated:", len(story.Titles.Updated))
-		fmt.Println("Title deleted:", len(story.Titles.Deleted))
-		fmt.Println("Title kept:", len(story.Titles.Kept))
-		fmt.Println("Title_BaseTitle added:", len(story.Title_BaseTitles.Added))
-		fmt.Println("Title_BaseTitle updated:", len(story.Title_BaseTitles.Updated))
-		fmt.Println("Title_BaseTitle deleted:", len(story.Title_BaseTitles.Deleted))
-		fmt.Println("Title_BaseTitle kept:", len(story.Title_BaseTitles.Kept))
-		fmt.Println("Title_LiegeTitle added:", len(story.Title_LiegeTitles.Added))
-		fmt.Println("Title_LiegeTitle updated:", len(story.Title_LiegeTitles.Updated))
-		fmt.Println("Title_LiegeTitle deleted:", len(story.Title_LiegeTitles.Deleted))
-		fmt.Println("Title_LiegeTitle kept:", len(story.Title_LiegeTitles.Kept))
-		fmt.Println("Title_DejureLiegeTitle added:", len(story.Title_DejureLiegeTitles.Added))
-		fmt.Println("Title_DejureLiegeTitle updated:", len(story.Title_DejureLiegeTitles.Updated))
-		fmt.Println("Title_DejureLiegeTitle deleted:", len(story.Title_DejureLiegeTitles.Deleted))
-		fmt.Println("Title_DejureLiegeTitle kept:", len(story.Title_DejureLiegeTitles.Kept))
-		fmt.Println("Title_AssimilatingLiegeTitle added:", len(story.Title_AssimilatingLiegeTitles.Added))
-		fmt.Println("Title_AssimilatingLiegeTitle updated:", len(story.Title_AssimilatingLiegeTitles.Updated))
-		fmt.Println("Title_AssimilatingLiegeTitle deleted:", len(story.Title_AssimilatingLiegeTitles.Deleted))
-		fmt.Println("Title_AssimilatingLiegeTitle kept:", len(story.Title_AssimilatingLiegeTitles.Kept))
-		fmt.Println("Title_Dynasty added:", len(story.Title_Dynasties.Added))
-		fmt.Println("Title_Dynasty updated:", len(story.Title_Dynasties.Updated))
-		fmt.Println("Title_Dynasty deleted:", len(story.Title_Dynasties.Deleted))
-		fmt.Println("Title_Dynasty kept:", len(story.Title_Dynasties.Kept))
-		fmt.Println("Title_People added:", len(story.Title_People.Added))
-		fmt.Println("Title_People updated:", len(story.Title_People.Updated))
-		fmt.Println("Title_People deleted:", len(story.Title_People.Deleted))
-		fmt.Println("Title_People kept:", len(story.Title_People.Kept))
-		fmt.Println("Story_Title added:", len(story.Story_Titles.Added))
-		fmt.Println("Story_Title updated:", len(story.Story_Titles.Updated))
-		fmt.Println("Story_Title deleted:", len(story.Story_Titles.Deleted))
-		fmt.Println("Story_Title kept:", len(story.Story_Titles.Kept))
-		fmt.Println("Province added:", len(story.Provinces.Added))
-		fmt.Println("Province updated:", len(story.Provinces.Updated))
-		fmt.Println("Province deleted:", len(story.Provinces.Deleted))
-		fmt.Println("Province kept:", len(story.Provinces.Kept))
-		fmt.Println("Story_Province added:", len(story.Story_Provinces.Added))
-		fmt.Println("Story_Province updated:", len(story.Story_Provinces.Updated))
-		fmt.Println("Story_Province deleted:", len(story.Story_Provinces.Deleted))
-		fmt.Println("Story_Province kept:", len(story.Story_Provinces.Kept))
-		fmt.Println("Province_Modifier added:", len(story.Province_Modifiers.Added))
-		fmt.Println("Province_Modifier updated:", len(story.Province_Modifiers.Updated))
-		fmt.Println("Province_Modifier deleted:", len(story.Province_Modifiers.Deleted))
-		fmt.Println("Province_Modifier kept:", len(story.Province_Modifiers.Kept))
-		fmt.Println("Province_Culture added:", len(story.Province_Cultures.Added))
-		fmt.Println("Province_Culture updated:", len(story.Province_Cultures.Updated))
-		fmt.Println("Province_Culture deleted:", len(story.Province_Cultures.Deleted))
-		fmt.Println("Province_Culture kept:", len(story.Province_Cultures.Kept))
-		fmt.Println("Province_Religion added:", len(story.Province_Religions.Added))
-		fmt.Println("Province_Religion updated:", len(story.Province_Religions.Updated))
-		fmt.Println("Province_Religion deleted:", len(story.Province_Religions.Deleted))
-		fmt.Println("Province_Religion kept:", len(story.Province_Religions.Kept))
-		fmt.Println("Province_Title added:", len(story.Province_Titles.Added))
-		fmt.Println("Province_Title updated:", len(story.Province_Titles.Updated))
-		fmt.Println("Province_Title deleted:", len(story.Province_Titles.Deleted))
-		fmt.Println("Province_Title kept:", len(story.Province_Titles.Kept))
-		fmt.Println("Baron added:", len(story.Barons.Added))
-		fmt.Println("Baron updated:", len(story.Barons.Updated))
-		fmt.Println("Baron deleted:", len(story.Barons.Deleted))
-		fmt.Println("Baron kept:", len(story.Barons.Kept))
-		fmt.Println("Province_Baron added:", len(story.Province_Barons.Added))
-		fmt.Println("Province_Baron updated:", len(story.Province_Barons.Updated))
-		fmt.Println("Province_Baron deleted:", len(story.Province_Barons.Deleted))
-		fmt.Println("Province_Baron kept:", len(story.Province_Barons.Kept))
-		fmt.Println("Baron_Building added:", len(story.Baron_Buildings.Added))
-		fmt.Println("Baron_Building updated:", len(story.Baron_Buildings.Updated))
-		fmt.Println("Baron_Building deleted:", len(story.Baron_Buildings.Deleted))
-		fmt.Println("Baron_Building kept:", len(story.Baron_Buildings.Kept))
-		fmt.Println("Baron_Title added:", len(story.Baron_Titles.Added))
-		fmt.Println("Baron_Title updated:", len(story.Baron_Titles.Updated))
-		fmt.Println("Baron_Title deleted:", len(story.Baron_Titles.Deleted))
-		fmt.Println("Baron_Title kept:", len(story.Baron_Titles.Kept))
-		fmt.Println("Story_Baron added:", len(story.Story_Barons.Added))
-		fmt.Println("Story_Baron updated:", len(story.Story_Barons.Updated))
-		fmt.Println("Story_Baron deleted:", len(story.Story_Barons.Deleted))
-		fmt.Println("Story_Baron kept:", len(story.Story_Barons.Kept))
-		fmt.Println("Dynasty added:", len(story.Dynasties.Added))
-		fmt.Println("Dynasty updated:", len(story.Dynasties.Updated))
-		fmt.Println("Dynasty deleted:", len(story.Dynasties.Deleted))
-		fmt.Println("Dynasty kept:", len(story.Dynasties.Kept))
-		fmt.Println("Dynasty_Culture added:", len(story.Dynasty_Cultures.Added))
-		fmt.Println("Dynasty_Culture updated:", len(story.Dynasty_Cultures.Updated))
-		fmt.Println("Dynasty_Culture deleted:", len(story.Dynasty_Cultures.Deleted))
-		fmt.Println("Dynasty_Culture kept:", len(story.Dynasty_Cultures.Kept))
-		fmt.Println("Dynasty_Religion added:", len(story.Dynasty_Religions.Added))
-		fmt.Println("Dynasty_Religion updated:", len(story.Dynasty_Religions.Updated))
-		fmt.Println("Dynasty_Religion deleted:", len(story.Dynasty_Religions.Deleted))
-		fmt.Println("Dynasty_Religion kept:", len(story.Dynasty_Religions.Kept))
-		fmt.Println("Story_Dynasty added:", len(story.Story_Dynasties.Added))
-		fmt.Println("Story_Dynasty updated:", len(story.Story_Dynasties.Updated))
-		fmt.Println("Story_Dynasty deleted:", len(story.Story_Dynasties.Deleted))
-		fmt.Println("Story_Dynasty kept:", len(story.Story_Dynasties.Kept))
-		fmt.Println("People added:", len(story.People.Added))
-		fmt.Println("People updated:", len(story.People.Updated))
-		fmt.Println("People deleted:", len(story.People.Deleted))
-		fmt.Println("People kept:", len(story.People.Kept))
-		fmt.Println("People_Culture added:", len(story.People_Cultures.Added))
-		fmt.Println("People_Culture updated:", len(story.People_Cultures.Updated))
-		fmt.Println("People_Culture deleted:", len(story.People_Cultures.Deleted))
-		fmt.Println("People_Culture kept:", len(story.People_Cultures.Kept))
-		fmt.Println("People_GFXCulture added:", len(story.People_GFXCultures.Added))
-		fmt.Println("People_GFXCulture updated:", len(story.People_GFXCultures.Updated))
-		fmt.Println("People_GFXCulture deleted:", len(story.People_GFXCultures.Deleted))
-		fmt.Println("People_GFXCulture kept:", len(story.People_GFXCultures.Kept))
-		fmt.Println("People_Religion added:", len(story.People_Religions.Added))
-		fmt.Println("People_Religion updated:", len(story.People_Religions.Updated))
-		fmt.Println("People_Religion deleted:", len(story.People_Religions.Deleted))
-		fmt.Println("People_Religion kept:", len(story.People_Religions.Kept))
-		fmt.Println("People_SecretReligion added:", len(story.People_SecretReligions.Added))
-		fmt.Println("People_SecretReligion updated:", len(story.People_SecretReligions.Updated))
-		fmt.Println("People_SecretReligion deleted:", len(story.People_SecretReligions.Deleted))
-		fmt.Println("People_SecretReligion kept:", len(story.People_SecretReligions.Kept))
-		fmt.Println("Story_People added:", len(story.Story_People.Added))
-		fmt.Println("Story_People updated:", len(story.Story_People.Updated))
-		fmt.Println("Story_People deleted:", len(story.Story_People.Deleted))
-		fmt.Println("Story_People kept:", len(story.Story_People.Kept))
-		fmt.Println("People_Trait added:", len(story.People_Traits.Added))
-		fmt.Println("People_Trait updated:", len(story.People_Traits.Updated))
-		fmt.Println("People_Trait deleted:", len(story.People_Traits.Deleted))
-		fmt.Println("People_Trait kept:", len(story.People_Traits.Kept))
-		fmt.Println("People_Modifier added:", len(story.People_Modifiers.Added))
-		fmt.Println("People_Modifier updated:", len(story.People_Modifiers.Updated))
-		fmt.Println("People_Modifier deleted:", len(story.People_Modifiers.Deleted))
-		fmt.Println("People_Modifier kept:", len(story.People_Modifiers.Kept))
-		fmt.Println("People_ClaimTitle added:", len(story.People_ClaimTitles.Added))
-		fmt.Println("People_ClaimTitle updated:", len(story.People_ClaimTitles.Updated))
-		fmt.Println("People_ClaimTitle deleted:", len(story.People_ClaimTitles.Deleted))
-		fmt.Println("People_ClaimTitle kept:", len(story.People_ClaimTitles.Kept))
-		fmt.Println("People_Dynasty added:", len(story.People_Dynasties.Added))
-		fmt.Println("People_Dynasty updated:", len(story.People_Dynasties.Updated))
-		fmt.Println("People_Dynasty deleted:", len(story.People_Dynasties.Deleted))
-		fmt.Println("People_Dynasty kept:", len(story.People_Dynasties.Kept))
-		fmt.Println("People_FamilyPeople added:", len(story.People_Families.Added))
-		fmt.Println("People_FamilyPeople updated:", len(story.People_Families.Updated))
-		fmt.Println("People_FamilyPeople deleted:", len(story.People_Families.Deleted))
-		fmt.Println("People_FamilyPeople kept:", len(story.People_Families.Kept))
-		fmt.Println("People_HostPeople added:", len(story.People_Hosts.Added))
-		fmt.Println("People_HostPeople updated:", len(story.People_Hosts.Updated))
-		fmt.Println("People_HostPeople deleted:", len(story.People_Hosts.Deleted))
-		fmt.Println("People_HostPeople kept:", len(story.People_Hosts.Kept))
-		fmt.Println("People_EmpirePeople added:", len(story.People_Empires.Added))
-		fmt.Println("People_EmpirePeople updated:", len(story.People_Empires.Updated))
-		fmt.Println("People_EmpirePeople deleted:", len(story.People_Empires.Deleted))
-		fmt.Println("People_EmpirePeople kept:", len(story.People_Empires.Kept))
-		fmt.Println("People_KillPeople added:", len(story.People_Killers.Added))
-		fmt.Println("People_KillPeople updated:", len(story.People_Killers.Updated))
-		fmt.Println("People_KillPeople deleted:", len(story.People_Killers.Deleted))
-		fmt.Println("People_KillPeople kept:", len(story.People_Killers.Kept))
-		fmt.Println("People_RelatePeople added:", len(story.People_Relates.Added))
-		fmt.Println("People_RelatePeople updated:", len(story.People_Relates.Updated))
-		fmt.Println("People_RelatePeople deleted:", len(story.People_Relates.Deleted))
-		fmt.Println("People_RelatePeople kept:", len(story.People_Relates.Kept))
-		fmt.Println("People_LoverPeople added:", len(story.People_Lovers.Added))
-		fmt.Println("People_LoverPeople updated:", len(story.People_Lovers.Updated))
-		fmt.Println("People_LoverPeople deleted:", len(story.People_Lovers.Deleted))
-		fmt.Println("People_LoverPeople kept:", len(story.People_Lovers.Kept))
-		fmt.Println("People_GuardianPeople added:", len(story.People_Guardians.Added))
-		fmt.Println("People_GuardianPeople updated:", len(story.People_Guardians.Updated))
-		fmt.Println("People_GuardianPeople deleted:", len(story.People_Guardians.Deleted))
-		fmt.Println("People_GuardianPeople kept:", len(story.People_Guardians.Kept))
-		fmt.Println("People_Ambition added:", len(story.People_Ambtions.Added))
-		fmt.Println("People_Ambition updated:", len(story.People_Ambtions.Updated))
-		fmt.Println("People_Ambition deleted:", len(story.People_Ambtions.Deleted))
-		fmt.Println("People_Ambition kept:", len(story.People_Ambtions.Kept))
-		fmt.Println("People_Focus added:", len(story.People_Focuses.Added))
-		fmt.Println("People_Focus updated:", len(story.People_Focuses.Updated))
-		fmt.Println("People_Focus deleted:", len(story.People_Focuses.Deleted))
-		fmt.Println("People_Focus kept:", len(story.People_Focuses.Kept))
-		fmt.Println("Story_Player added:", len(story.Story_Player.Added))
-		fmt.Println("Story_Player updated:", len(story.Story_Player.Updated))
-		fmt.Println("Story_Player deleted:", len(story.Story_Player.Deleted))
-		fmt.Println("Story_Player kept:", len(story.Story_Player.Kept))
+		printCompareAndUpdatedResult(story.Story)
+		printCompareAndUpdatedResult(story.Titles)
+		printCompareAndUpdatedResult(story.Title_BaseTitles)
+		printCompareAndUpdatedResult(story.Title_LiegeTitles)
+		printCompareAndUpdatedResult(story.Title_DejureLiegeTitles)
+		printCompareAndUpdatedResult(story.Title_AssimilatingLiegeTitles)
+		printCompareAndUpdatedResult(story.Title_Dynasties)
+		printCompareAndUpdatedResult(story.Title_People)
+		printCompareAndUpdatedResult(story.Story_Titles)
+		printCompareAndUpdatedResult(story.Provinces)
+		printCompareAndUpdatedResult(story.Story_Provinces)
+		printCompareAndUpdatedResult(story.Province_Modifiers)
+		printCompareAndUpdatedResult(story.Province_Cultures)
+		printCompareAndUpdatedResult(story.Province_Religions)
+		printCompareAndUpdatedResult(story.Province_Titles)
+		printCompareAndUpdatedResult(story.Barons)
+		printCompareAndUpdatedResult(story.Province_Barons)
+		printCompareAndUpdatedResult(story.Baron_Buildings)
+		printCompareAndUpdatedResult(story.Baron_Titles)
+		printCompareAndUpdatedResult(story.Story_Barons)
+		printCompareAndUpdatedResult(story.Dynasties)
+		printCompareAndUpdatedResult(story.Dynasty_Cultures)
+		printCompareAndUpdatedResult(story.Dynasty_Religions)
+		printCompareAndUpdatedResult(story.Story_Dynasties)
+		printCompareAndUpdatedResult(story.People)
+		printCompareAndUpdatedResult(story.People_Cultures)
+		printCompareAndUpdatedResult(story.People_GFXCultures)
+		printCompareAndUpdatedResult(story.People_Religions)
+		printCompareAndUpdatedResult(story.People_SecretReligions)
+		printCompareAndUpdatedResult(story.Story_People)
+		printCompareAndUpdatedResult(story.People_Traits)
+		printCompareAndUpdatedResult(story.People_Modifiers)
+		printCompareAndUpdatedResult(story.People_ClaimTitles)
+		printCompareAndUpdatedResult(story.People_Dynasties)
+		printCompareAndUpdatedResult(story.People_Families)
+		printCompareAndUpdatedResult(story.People_Hosts)
+		printCompareAndUpdatedResult(story.People_Empires)
+		printCompareAndUpdatedResult(story.People_Killers)
+		printCompareAndUpdatedResult(story.People_Relates)
+		printCompareAndUpdatedResult(story.People_Lovers)
+		printCompareAndUpdatedResult(story.People_Guardians)
+		printCompareAndUpdatedResult(story.People_Ambtions)
+		printCompareAndUpdatedResult(story.People_Focuses)
+		printCompareAndUpdatedResult(story.Story_Player)
+	}
+}
+
+func printCompareAndUpdatedResult[T interface{}](result *nebulagolang.CompareResult[T]) {
+	name := utils.GetType[T]().Name()
+	if result == nil {
+		fmt.Printf("%sNo data for %s%s\n", utils.PrintColorRed, name, utils.PrintColorReset)
+		return
+	}
+
+	if len(result.Added) > 0 {
+		fmt.Printf("%s%s added: %d%s\n", utils.PrintColorGreen, name, len(result.Added), utils.PrintColorReset)
+	}
+
+	if len(result.Updated) > 0 {
+		fmt.Printf("%s%s updated: %d%s\n", utils.PrintColorYellow, name, len(result.Updated), utils.PrintColorReset)
+	}
+
+	if len(result.Deleted) > 0 {
+		fmt.Printf("%s%s deleted: %d%s\n", utils.PrintColorRed, name, len(result.Deleted), utils.PrintColorReset)
+	}
+
+	if len(result.Kept) > 0 {
+		fmt.Printf("%s%s kept: %d%s\n", utils.PrintColorWhite, name, len(result.Kept), utils.PrintColorReset)
 	}
 }
 
