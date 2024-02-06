@@ -50,28 +50,56 @@ func getDynastyVid(playId int, dynastyId int) string {
 	return fmt.Sprintf("dynasty.%d.%d", dynastyId, playId)
 }
 
-func (p *Dynasty) InsertToNebula(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.InsertVertexes(space, p)
+func (d *Dynasty) InsertToNebula(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.InsertVertexes(space, d)
 }
 
-func (p *Dynasty) UpdateToNebula(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.UpdateVertexes(space, p)
+func (d *Dynasty) UpdateToNebula(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.UpdateVertexes(space, d)
 }
 
-func (p *Dynasty) UpsertToNebula(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.UpsertVertexes(space, p)
+func (d *Dynasty) UpsertToNebula(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.UpsertVertexes(space, d)
 }
 
-func (p *Dynasty) DeleteFromNebula(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.DeleteVertexes(space, p)
+func (d *Dynasty) DeleteFromNebula(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.DeleteVertexes(space, d)
 }
 
-func (p *Dynasty) DeleteFromNebulaWithEdge(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.DeleteVertexesWithEdges(space, p)
+func (d *Dynasty) DeleteFromNebulaWithEdge(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.DeleteVertexesWithEdges(space, d)
 }
 
-func (p *Dynasty) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Result {
-	return nebulagolang.LoadVertex(space, p)
+func (d *Dynasty) LoadFromNebula(space *nebulagolang.Space) *nebulagolang.Result {
+	return nebulagolang.LoadVertex(space, d)
+}
+
+func (d *Dynasty) GetAlivePeoples(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_dynasty reversely where properties($$).isdead==false yield $$ as v", d.VID)
+
+	return d.getPeopleByQuery(space, command)
+}
+
+func (d *Dynasty) GetPeoples(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("go from \"%s\" over people_dynasty reversely yield $$ as v", d.VID)
+
+	return d.getPeopleByQuery(space, command)
+}
+
+func (d *Dynasty) getPeopleByQuery(space *nebulagolang.Space, command string) *nebulagolang.ResultT[map[int]*People] {
+	r := nebulagolang.QueryVertexesByQueryToSlice[*People](space, command)
+
+	if !r.Ok {
+		return nebulagolang.NewResultT[map[int]*People](r.Result)
+	}
+
+	result := make(map[int]*People)
+
+	for _, f := range r.Data {
+		result[f.ID] = f
+	}
+
+	return nebulagolang.NewResultTWithData(r.Result, result)
 }
 
 func InsertDynastys(space *nebulagolang.Space, ps ...*Dynasty) *nebulagolang.Result {

@@ -157,6 +157,18 @@ func (p *People) GetFamilies(space *nebulagolang.Space) *nebulagolang.ResultT[ma
 	return p.getPeopleByQuery(space, command)
 }
 
+func (p *People) GetAliveDistanceFamilies(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
+	commands := []string{
+		fmt.Sprintf("fetch prop on people \"%s\" yield id(vertex) as vid, properties(vertex).dynasty as dynasty", p.VID),
+		"go 1 to 2 steps from $-.vid over people_familypeople BIDIRECT where properties($$).isdead==false and (properties(edge).relation==\"son\" or properties(edge).relation==\"daughter\") and properties($$).dynasty==$-.dynasty yield distinct id($$) as myfamilyids,$-.vid as vid,$-.dynasty as dynasty",
+		"yield collect($-.myfamilyids) as myfamilyids, $-.vid as vid, $-.dynasty as dynasty",
+		"go from $-.vid over people_dynasty yield id($$) as vid, $-.myfamilyids as myfamilyids",
+		"go from $-.vid over people_dynasty reversely where id($$) not in $-.myfamilyids and properties($$).isdead==false yield $$ as v",
+	}
+
+	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
+}
+
 func (p *People) GetAliveBrothersAndSisters(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {
 	commands := []string{
 		fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" or people_familypeople.relation==\"mother\" yield $$ as v", p.VID),
