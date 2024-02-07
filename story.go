@@ -306,52 +306,54 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	chanelDeep := len(rfv)
 
+	sem := make(chan struct{}, 4)
+
 	cuResultChanel := make(chan *CUResult, chanelDeep)
 
-	CRData(cuResultChanel, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Titles, getPlayIdQuery[Title](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Title_People, getPlayIdQuery[Title_People](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Provinces, getPlayIdQuery[Province](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Barons, getPlayIdQuery[Baron](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People, getPlayIdQuery[People](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.StoryId), fields)
-	CRData(cuResultChanel, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People, getPlayIdQuery[People](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Religions, getPlayIdQuery[People_Religion](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_SecretReligions, getPlayIdQuery[People_SecretReligion](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Traits, getPlayIdQuery[People_Trait](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Modifiers, getPlayIdQuery[People_Modifier](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_ClaimTitles, getPlayIdQuery[People_ClaimTitle](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Dynasties, getPlayIdQuery[People_Dynasty](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Families, getPlayIdQuery[People_FamilyPeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Hosts, getPlayIdQuery[People_HostPeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Empires, getPlayIdQuery[People_EmpirePeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Killers, getPlayIdQuery[People_KillPeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Lovers, getPlayIdQuery[People_LoverPeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Guardians, getPlayIdQuery[People_GuardianPeople](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Ambtions, getPlayIdQuery[People_Ambition](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People_Focuses, getPlayIdQuery[People_Focus](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, []*Story{s.Story}, getPlayIdQuery[Story](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Titles, getPlayIdQuery[Title](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_BaseTitles, getPlayIdQuery[Title_BaseTitle](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_LiegeTitles, getPlayIdQuery[Title_LiegeTitle](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_DejureLiegeTitles, getPlayIdQuery[Title_DejureLiegeTitle](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_AssimilatingLiegeTitles, getPlayIdQuery[Title_AssimilatingLiegeTitle](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_Dynasties, getPlayIdQuery[Title_Dynasty](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Title_People, getPlayIdQuery[Title_People](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_Titles, getPlayIdQuery[Story_Title](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Provinces, getPlayIdQuery[Province](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_Provinces, getPlayIdQuery[Story_Province](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Province_Modifiers, getPlayIdQuery[Province_Modifier](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Province_Cultures, getPlayIdQuery[Province_Culture](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Province_Religions, getPlayIdQuery[Province_Religion](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Province_Titles, getPlayIdQuery[Province_Title](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Barons, getPlayIdQuery[Baron](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Province_Barons, getPlayIdQuery[Province_Baron](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Baron_Buildings, getPlayIdQuery[Baron_Building](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Baron_Titles, getPlayIdQuery[Baron_Title](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_Barons, getPlayIdQuery[Story_Baron](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Dynasties, getPlayIdQuery[Dynasty](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Dynasty_Cultures, getPlayIdQuery[Dynasty_Culture](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId), fields)
 
 	var updateResult *nebulagolang.Result
 
@@ -367,27 +369,24 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 		if len(fields) == 0 {
 			break
 		}
-
-		left := make([]string, 0)
-		for k, _ := range fields {
-			left = append(left, k)
-		}
-
-		fmt.Printf("Left %s.\n", strings.Join(left, ", "))
 	}
 
 	return result, updateResult
 }
 
-func CRData[T interface{}](chanel chan<- *CUResult, data []T, query string, fields map[string]bool) {
+func CRData[T interface{}](chanel chan<- *CUResult, sem chan struct{}, data []T, query string, fields map[string]bool) {
 	t := utils.GetType[T]()
 	fields[t.Name()] = true
+	sem <- struct{}{}
 	go func() {
+		defer func() { <-sem }()
 		log.Printf("Compare and update %s.\n", t.Name())
 		r := &CUResult{Name: t.Name(), StartTime: time.Now()}
 		usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery[T](SPACE, data, query)
 		r.UpdateResult = usr
 		r.CompareResult = csr
+		diff := time.Now().Sub(r.StartTime)
+		log.Printf("%sCompare and update %s done. Take %.0f seconds.%s\n", utils.PrintColorYellow, r.Name, diff.Seconds(), utils.PrintColorReset)
 		chanel <- r
 	}()
 }
@@ -416,10 +415,6 @@ func UpdateStoryCompareAndUpdateDetail(detail map[reflect.Type]reflect.Value, re
 
 	if v, ok := detail[t]; ok {
 		v.Set(reflect.ValueOf(result.CompareResult))
-
-		diff := time.Now().Sub(result.StartTime)
-
-		log.Printf("%sCompare and update %s done. Take %.0f seconds.%s\n", utils.PrintColorYellow, result.Name, diff.Seconds(), utils.PrintColorReset)
 	}
 	delete(fields, result.Name)
 
