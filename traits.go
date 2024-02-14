@@ -31,7 +31,7 @@ func GenerateTraitsData(path string) (
 func BuildTraits(path string) {
 	ts, tots := GenerateTraitsData(path)
 
-	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ts, "")
+	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ts, "", false)
 
 	if !ur.Ok {
 		log.Fatalf("Load and update trait error: %s", ur.Err.Error())
@@ -42,7 +42,7 @@ func BuildTraits(path string) {
 		log.Println("Traits kept:", len(cr.Kept))
 	}
 
-	utotr, ctotr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, tots, "")
+	utotr, ctotr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, tots, "", false)
 
 	if !utotr.Ok {
 		log.Fatalf("Load and update trait_oppositetrait error: %s", utotr.Err.Error())

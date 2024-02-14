@@ -30,7 +30,7 @@ func GenerateModifiersData(path string) []*Modifier {
 func BuildModifiers(path string) {
 	ms := GenerateModifiersData(path)
 
-	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ms, "")
+	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ms, "", false)
 
 	if !ur.Ok {
 		log.Fatalf("Load and update modifiers error: %s", ur.Err.Error())

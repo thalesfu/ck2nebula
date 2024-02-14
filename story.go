@@ -306,7 +306,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	chanelDeep := len(rfv)
 
-	sem := make(chan struct{}, 4)
+	sem := make(chan struct{}, 10)
 
 	cuResultChanel := make(chan *CUResult, chanelDeep)
 
@@ -382,7 +382,7 @@ func CRData[T interface{}](chanel chan<- *CUResult, sem chan struct{}, data []T,
 		defer func() { <-sem }()
 		log.Printf("Compare and update %s.\n", t.Name())
 		r := &CUResult{Name: t.Name(), StartTime: time.Now()}
-		usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery[T](SPACE, data, query)
+		usr, csr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery[T](SPACE, data, query, false)
 		r.UpdateResult = usr
 		r.CompareResult = csr
 		diff := time.Now().Sub(r.StartTime)
@@ -482,19 +482,19 @@ func printCompareAndUpdatedResult[T interface{}](result *nebulagolang.CompareRes
 	}
 
 	if len(result.Added) > 0 {
-		fmt.Printf("%s%s added: %d%s\n", utils.PrintColorGreen, name, len(result.Added), utils.PrintColorReset)
+		fmt.Printf("%s%s added: %d%s\n", utils.PrintColorGreen, name, result.AddedCount, utils.PrintColorReset)
 	}
 
 	if len(result.Updated) > 0 {
-		fmt.Printf("%s%s updated: %d%s\n", utils.PrintColorYellow, name, len(result.Updated), utils.PrintColorReset)
+		fmt.Printf("%s%s updated: %d%s\n", utils.PrintColorYellow, name, result.UpdatedCount, utils.PrintColorReset)
 	}
 
 	if len(result.Deleted) > 0 {
-		fmt.Printf("%s%s deleted: %d%s\n", utils.PrintColorRed, name, len(result.Deleted), utils.PrintColorReset)
+		fmt.Printf("%s%s deleted: %d%s\n", utils.PrintColorRed, name, result.DeletedCount, utils.PrintColorReset)
 	}
 
 	if len(result.Kept) > 0 {
-		fmt.Printf("%s%s kept: %d%s\n", utils.PrintColorWhite, name, len(result.Kept), utils.PrintColorReset)
+		fmt.Printf("%s%s kept: %d%s\n", utils.PrintColorWhite, name, result.DeletedCount, utils.PrintColorReset)
 	}
 }
 

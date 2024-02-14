@@ -22,7 +22,7 @@ func GenerateObjectivesData(path string) []*Objective {
 func BuildObjectives(path string) {
 	os := GenerateObjectivesData(path)
 
-	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, os, "")
+	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, os, "", false)
 
 	if !ur.Ok {
 		log.Fatalf("Load and update objectives error: %s", ur.Err.Error())

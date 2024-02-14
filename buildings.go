@@ -24,7 +24,7 @@ func GenerateBuildingsData(path string) []*Building {
 func BuildBuildings(path string) {
 	ms := GenerateBuildingsData(path)
 
-	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ms, "")
+	ur, cr := nebulagolang.CompareAndUpdateNebulaEntityBySliceAndQuery(SPACE, ms, "", false)
 
 	if !ur.Ok {
 		log.Fatalf("Load and update buildings error: %s", ur.Err.Error())

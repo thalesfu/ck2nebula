@@ -173,8 +173,8 @@ func (p *People) GetAliveBrothersAndSisters(space *nebulagolang.Space) *nebulago
 	commands := []string{
 		fmt.Sprintf("go from \"%s\" over people_familypeople where people_familypeople.relation==\"father\" or people_familypeople.relation==\"mother\" yield $$ as v", p.VID),
 		"yield id($-.v) as vid",
-		"go from $-.vid over people_familypeople where people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\" and properties($$).isdead==false yield $$ as v",
-		fmt.Sprintf("yield $-.v as v where id($-.v)!=\"%s\"", p.VID),
+		"go from $-.vid over people_familypeople where (people_familypeople.relation==\"son\" or people_familypeople.relation==\"real_son\" or people_familypeople.relation==\"daughter\" or people_familypeople.relation==\"real_daughter\") and properties($$).isdead==false yield $$ as v",
+		fmt.Sprintf("yield distinct $-.v as v where id($-.v)!=\"%s\"", p.VID),
 	}
 
 	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
