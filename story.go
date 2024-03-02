@@ -311,7 +311,6 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 	cuResultChanel := make(chan *CUResult, chanelDeep)
 
 	CRData(cuResultChanel, sem, s.People_Relates, getPlayIdQuery[People_RelatePeople](s.Story.StoryId), fields)
-	CRData(cuResultChanel, sem, s.People, getPlayIdQuery[People](s.Story.StoryId), fields)
 	CRData(cuResultChanel, sem, s.Story_People, getPlayIdQuery[Story_People](s.Story.StoryId), fields)
 	CRData(cuResultChanel, sem, s.People_Cultures, getPlayIdQuery[People_Culture](s.Story.StoryId), fields)
 	CRData(cuResultChanel, sem, s.People_GFXCultures, getPlayIdQuery[People_GFXCulture](s.Story.StoryId), fields)
@@ -354,6 +353,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 	CRData(cuResultChanel, sem, s.Dynasty_Religions, getPlayIdQuery[Dynasty_Religion](s.Story.StoryId), fields)
 	CRData(cuResultChanel, sem, s.Story_Dynasties, getPlayIdQuery[Story_Dynasty](s.Story.StoryId), fields)
 	CRData(cuResultChanel, sem, s.Story_Player, getPlayIdQuery[Story_Player](s.Story.StoryId), fields)
+	CRData(cuResultChanel, sem, s.People, getPlayIdQuery[People](s.Story.StoryId), fields)
 
 	var updateResult *nebulagolang.Result
 
