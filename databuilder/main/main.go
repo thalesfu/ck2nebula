@@ -2,15 +2,15 @@ package main
 
 import "github.com/thalesfu/ck2nebula"
 
-const ck2Folder = "R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II"
-const saveFile = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\酒泉771_02_14dd.ck2"
-const saveFile2 = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\閰掓硥796_12_01.ck2"
-const saveFile3 = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\酒泉796_12_01.ck2"
-const saveFile4 = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\尿普湖769_01_01.ck2"
-const saveFile5 = "T:\\OneDrive\\fu.thales@live.com\\OneDrive\\MyDocument\\Paradox Interactive\\Crusader Kings II\\save games\\岳普湖769_01_01.ck2"
+const ck2Folder = "/Volumes/[C] Windows 11.hidden/Program Files (x86)/Steam/steamapps/common/Crusader Kings II"
+const saveFile = "/Users/thalesfu/Documents/Paradox Interactive/Crusader Kings II/save games/酒泉771_02_14dd.ck2"
+const saveFile2 = "/Users/thalesfu/Documents/Paradox Interactive/Crusader Kings II/save games/閰掓硥796_12_01.ck2"
+const saveFile3 = "/Users/thalesfu/Documents/Paradox Interactive/Crusader Kings II/save games/酒泉796_12_01.ck2"
+const saveFile4 = "/Users/thalesfu/Documents/Paradox Interactive/Crusader Kings II/save games/尿普湖769_01_01.ck2"
+const saveFile5 = "/Users/thalesfu/Documents/Paradox Interactive/Crusader Kings II/save games/岳普湖769_01_01.ck2"
 
 func main() {
-	//cgs, cs, cg_c_s := ck2nebula.GenerateCultureData("R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II")
+	//cgs, cs, cg_c_s := ck2nebula.GenerateCultureData("/Volumes/[C] Windows 11.hidden/Program Files (x86)/Steam/steamapps/common/Crusader Kings II")
 	//
 	//fmt.Println(utils.MarshalJSON(cgs))
 	//fmt.Println(utils.MarshalJSON(cs))
@@ -40,7 +40,7 @@ func main() {
 	//	fmt.Println("Insert culturegroup_culture success")
 	//}
 
-	//rgs, rs, rg_r_s := ck2nebula.GenerateReligionData("R:\\Thales\\Game\\SteamLibrary\\steamapps\\common\\Crusader Kings II")
+	//rgs, rs, rg_r_s := ck2nebula.GenerateReligionData("/Volumes/[C] Windows 11.hidden/Program Files (x86)/Steam/steamapps/common/Crusader Kings II")
 	//
 	//fmt.Println(utils.MarshalJSON(rgs))
 	//fmt.Println(utils.MarshalJSON(rs))
