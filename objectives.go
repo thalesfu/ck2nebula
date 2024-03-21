@@ -27,7 +27,7 @@ func BuildObjectives(path string) {
 	if !ur.Ok {
 		log.Fatalf("Load and update objectives error: %s", ur.Err.Error())
 	} else {
-		log.Println("Objectives added:", len(cr.Added))
+		log.Println("Objectives added:", cr.AddedCount)
 		log.Println("Objectives updated:", len(cr.Updated))
 		log.Println("Objectives deleted:", len(cr.Deleted))
 		log.Println("Objectives kept:", len(cr.Kept))

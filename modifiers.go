@@ -35,9 +35,9 @@ func BuildModifiers(path string) {
 	if !ur.Ok {
 		log.Fatalf("Load and update modifiers error: %s", ur.Err.Error())
 	} else {
-		log.Println("Modifiers added:", len(cr.Added))
-		log.Println("Modifiers updated:", len(cr.Updated))
-		log.Println("Modifiers deleted:", len(cr.Deleted))
-		log.Println("Modifiers kept:", len(cr.Kept))
+		log.Println("Modifiers added:", cr.AddedCount)
+		log.Println("Modifiers updated:", cr.UpdatedCount)
+		log.Println("Modifiers deleted:", cr.DeletedCount)
+		log.Println("Modifiers kept:", cr.KeptCount)
 	}
 }
