@@ -306,7 +306,7 @@ func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebu
 
 	chanelDeep := len(rfv)
 
-	sem := make(chan struct{}, 15)
+	sem := make(chan struct{}, 40)
 
 	cuResultChanel := make(chan *CUResult, chanelDeep)
 
