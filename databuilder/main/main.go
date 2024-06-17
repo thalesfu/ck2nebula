@@ -38,47 +38,47 @@ func main() {
 
 	result = ck2nebula.InsertCultureGroup_Cultures(ck2nebula.SPACE, cg_c_s...)
 
-	if !result.Ok {
-		fmt.Println(result.Err.Error())
-	} else {
-		fmt.Println("Insert culturegroup_culture success")
-	}
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	fmt.Println("Insert culturegroup_culture success")
+	//}
+	//
+	//rgs, rs, rg_r_s := ck2nebula.GenerateReligionData("/Users/thalesfu/Windows/steam/steamapps/common/Crusader Kings II")
+	//
+	//fmt.Println(utils.MarshalJSON(rgs))
+	//fmt.Println(utils.MarshalJSON(rs))
+	//fmt.Println(utils.MarshalJSON(rg_r_s))
+	//
+	//result = ck2nebula.InsertReligionGroups(ck2nebula.SPACE, rgs...)
+	//
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	fmt.Println("Insert religion groups success")
+	//}
+	//
+	//result = ck2nebula.InsertReligions(ck2nebula.SPACE, rs...)
+	//
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	fmt.Println("Insert religion success")
+	//}
+	//
+	//result = ck2nebula.InsertReligionGroup_Religions(ck2nebula.SPACE, rg_r_s...)
+	//
+	//if !result.Ok {
+	//	fmt.Println(result.Err.Error())
+	//} else {
+	//	fmt.Println("Insert religiongroup_religion success")
+	//}
 
-	rgs, rs, rg_r_s := ck2nebula.GenerateReligionData("/Users/thalesfu/Windows/steam/steamapps/common/Crusader Kings II")
-
-	fmt.Println(utils.MarshalJSON(rgs))
-	fmt.Println(utils.MarshalJSON(rs))
-	fmt.Println(utils.MarshalJSON(rg_r_s))
-
-	result = ck2nebula.InsertReligionGroups(ck2nebula.SPACE, rgs...)
-
-	if !result.Ok {
-		fmt.Println(result.Err.Error())
-	} else {
-		fmt.Println("Insert religion groups success")
-	}
-
-	result = ck2nebula.InsertReligions(ck2nebula.SPACE, rs...)
-
-	if !result.Ok {
-		fmt.Println(result.Err.Error())
-	} else {
-		fmt.Println("Insert religion success")
-	}
-
-	result = ck2nebula.InsertReligionGroup_Religions(ck2nebula.SPACE, rg_r_s...)
-
-	if !result.Ok {
-		fmt.Println(result.Err.Error())
-	} else {
-		fmt.Println("Insert religiongroup_religion success")
-	}
-
-	ck2nebula.BuildModifiers(ck2Folder)
-	ck2nebula.BuildObjectives(ck2Folder)
+	//ck2nebula.BuildModifiers(ck2Folder)
+	//ck2nebula.BuildObjectives(ck2Folder)
 	//ck2nebula.DeleteAllObjective(ck2nebula.SPACE)
-	ck2nebula.BuildBuildings(ck2Folder)
-	ck2nebula.BuildTraits(ck2Folder)
+	//ck2nebula.BuildBuildings(ck2Folder)
+	//ck2nebula.BuildTraits(ck2Folder)
 	//result := ck2nebula.GetTraitById(ck2nebula.SPACE, 56)
 	//if !result.Ok {
 	//	fmt.Println(result.Err.Error())

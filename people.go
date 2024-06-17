@@ -56,11 +56,11 @@ func GeneratePeople(file *save.SaveFile, cm map[string]string, rm map[string]str
 			if ok {
 				rp[i].DynastyName = d.Name
 
-				if d.Culture != "" {
+				if rp[i].Culture == "" && d.Culture != "" {
 					rp[i].Culture = d.Culture
 				}
 
-				if d.Religion != "" {
+				if rp[i].Religion == "" && d.Religion != "" {
 					rp[i].Religion = d.Religion
 				}
 			}
