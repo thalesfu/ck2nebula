@@ -106,7 +106,7 @@ type StoryUpdateDetail struct {
 	Story_Player                  *nebulagolang.CompareResult[*Story_Player]
 }
 
-func GetStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) *StoryDetail {
+func GetStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
 	log.Println("Get story.")
 
 	s, ok, err := save.LoadSave(path, savePath)
@@ -121,12 +121,12 @@ func GetStory(path string, savePath string, cultureMap map[string]*Culture, reli
 		return nil
 	}
 
-	detail := GenerateStoryDetails(s, cultureMap, religionMap, translations, historyPeople)
+	detail := GenerateStoryDetails(s, cultureMap, religionMap, translations, historyPeople, historyDynasty)
 
 	return detail
 }
 
-func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, translations map[string]string, historyPeople map[int]*People) *StoryDetail {
+func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, translations map[string]string, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
 
 	titles,
 		baseTitles,
@@ -156,7 +156,7 @@ func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, r
 		people_lovers,
 		people_guardians,
 		people_ambtions,
-		people_focuses := GeneratePeople(file, cultureMap, religionMap, historyPeople)
+		people_focuses := GeneratePeople(file, cultureMap, religionMap, historyPeople, historyDynasty)
 
 	people_relations := GenerateRelations(file, translations)
 
@@ -276,8 +276,8 @@ type CUResult struct {
 	StartTime     time.Time
 }
 
-func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) (*StoryUpdateDetail, *nebulagolang.Result) {
-	s := GetStory(path, savePath, cultureMap, religionMap, historyPeople)
+func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) (*StoryUpdateDetail, *nebulagolang.Result) {
+	s := GetStory(path, savePath, cultureMap, religionMap, historyPeople, historyDynasty)
 
 	if s == nil {
 		return nil, nil
@@ -405,8 +405,8 @@ func UpdateStoryCompareAndUpdateDetail(detail map[reflect.Type]reflect.Value, re
 	return result.UpdateResult, true
 }
 
-func BuildStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) {
-	story, result := LoadAndUpdateStory(path, savePath, cultureMap, religionMap, historyPeople)
+func BuildStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) {
+	story, result := LoadAndUpdateStory(path, savePath, cultureMap, religionMap, historyPeople, historyDynasty)
 
 	if !result.Ok {
 		fmt.Println(result.Err)

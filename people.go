@@ -5,24 +5,7 @@ import (
 	"time"
 )
 
-func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) (
-	[]*People,
-	[]*People_Culture,
-	[]*People_GFXCulture,
-	[]*People_Religion,
-	[]*People_SecretReligion,
-	[]*People_Trait,
-	[]*People_Modifier,
-	[]*People_ClaimTitle,
-	[]*People_Dynasty,
-	[]*People_FamilyPeople,
-	[]*People_HostPeople,
-	[]*People_EmpirePeople,
-	[]*People_KillPeople,
-	[]*People_LoverPeople,
-	[]*People_GuardianPeople,
-	[]*People_Ambition,
-	[]*People_Focus) {
+func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) ([]*People, []*People_Culture, []*People_GFXCulture, []*People_Religion, []*People_SecretReligion, []*People_Trait, []*People_Modifier, []*People_ClaimTitle, []*People_Dynasty, []*People_FamilyPeople, []*People_HostPeople, []*People_EmpirePeople, []*People_KillPeople, []*People_LoverPeople, []*People_GuardianPeople, []*People_Ambition, []*People_Focus) {
 	rp := make([]*People, len(file.Characters))
 	rpcs := make([]*People_Culture, 0)
 	rpgcs := make([]*People_GFXCulture, 0)
@@ -50,8 +33,8 @@ func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religio
 	for _, c := range file.Characters {
 		rp[i] = NewPeopleByData(c)
 
-		rp[i].Culture = getMyCulture(c, file.Characters, historyPeople, file.Dynasties)
-		rp[i].Religion = getMyReligion(c, file.Characters, historyPeople, file.Dynasties)
+		rp[i].Culture = getMyCulture(c, file.Characters, historyPeople, file.Dynasties, historyDynasty)
+		rp[i].Religion = getMyReligion(c, file.Characters, historyPeople, file.Dynasties, historyDynasty)
 
 		if r, ok := religionMap[rp[i].Religion]; ok {
 			rp[i].ReligionName = r.Name
@@ -340,7 +323,7 @@ func processPeopleTrait(p *People, t *Trait) {
 	p.ModifiedCombatRating += t.CombatRating
 }
 
-func getMyCulture(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty) string {
+func getMyCulture(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
 	if me.Culture != "" {
 		return me.Culture
 	}
@@ -358,7 +341,7 @@ func getMyCulture(me *save.Character, characterMap map[int]*save.Character, hist
 					}
 				}
 
-				culture := getMyCulture(father, characterMap, historyPeople, nil)
+				culture := getMyCulture(father, characterMap, historyPeople, nil, nil)
 
 				if culture != "" {
 					return culture
@@ -374,12 +357,17 @@ func getMyCulture(me *save.Character, characterMap map[int]*save.Character, hist
 			}
 		}
 
+		if history, ok := historyDynasty[me.Dynasty]; ok {
+			if history.Culture != "" {
+				return history.Culture
+			}
+		}
 	}
 
 	return ""
 }
 
-func getMyReligion(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty) string {
+func getMyReligion(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
 	if me.Religion != "" {
 		return me.Religion
 	}
@@ -397,7 +385,7 @@ func getMyReligion(me *save.Character, characterMap map[int]*save.Character, his
 					}
 				}
 
-				religion := getMyReligion(father, characterMap, historyPeople, nil)
+				religion := getMyReligion(father, characterMap, historyPeople, nil, nil)
 
 				if religion != "" {
 					return religion
@@ -410,6 +398,12 @@ func getMyReligion(me *save.Character, characterMap map[int]*save.Character, his
 		if dynasty, ok := dynasties[me.Dynasty]; ok {
 			if dynasty.Religion != "" {
 				return dynasty.Religion
+			}
+		}
+
+		if history, ok := historyDynasty[me.Dynasty]; ok {
+			if history.Religion != "" {
+				return history.Religion
 			}
 		}
 	}
