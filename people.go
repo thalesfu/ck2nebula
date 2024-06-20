@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GeneratePeople(file *save.SaveFile, cm map[string]string, rm map[string]string) (
+func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) (
 	[]*People,
 	[]*People_Culture,
 	[]*People_GFXCulture,
@@ -50,26 +50,45 @@ func GeneratePeople(file *save.SaveFile, cm map[string]string, rm map[string]str
 	for _, c := range file.Characters {
 		rp[i] = NewPeopleByData(c)
 
-		if rp[i].Dynasty > 0 {
-			d, ok := file.Dynasties[rp[i].Dynasty]
+		rp[i].Culture = getMyCulture(c, file.Characters, historyPeople, file.Dynasties)
+		rp[i].Religion = getMyReligion(c, file.Characters, historyPeople, file.Dynasties)
 
-			if ok {
-				rp[i].DynastyName = d.Name
+		if r, ok := religionMap[rp[i].Religion]; ok {
+			rp[i].ReligionName = r.Name
+		}
+		if sr, ok := religionMap[rp[i].SecretReligion]; ok {
+			rp[i].SecretReligionName = sr.Name
+		}
+		if cul, ok := cultureMap[rp[i].Culture]; ok {
+			rp[i].CultureName = cul.Name
+		}
+		if gcul, ok := cultureMap[rp[i].GFXCulture]; ok {
+			rp[i].GFXCultureName = gcul.Name
+		}
 
-				if rp[i].Culture == "" && d.Culture != "" {
-					rp[i].Culture = d.Culture
-				}
-
-				if rp[i].Religion == "" && d.Religion != "" {
-					rp[i].Religion = d.Religion
+		for _, spouse := range c.Spouse {
+			if ps, ok := file.Characters[spouse]; ok {
+				if time.Time(ps.DeathDay).IsZero() {
+					rp[i].Married = true
 				}
 			}
 		}
 
-		rp[i].ReligionName = rm[rp[i].Religion]
-		rp[i].SecretReligionName = rm[rp[i].SecretReligion]
-		rp[i].CultureName = cm[rp[i].Culture]
-		rp[i].GFXCultureName = cm[rp[i].GFXCulture]
+		for _, consort := range c.Consort {
+			if pc, ok := file.Characters[consort]; ok {
+				if time.Time(pc.DeathDay).IsZero() {
+					rp[i].ConsortCount = rp[i].ConsortCount + 1
+				}
+			}
+		}
+
+		if c.ConsortOf > 0 {
+			if m, ok := file.Characters[c.ConsortOf]; ok {
+				if time.Time(m.DeathDay).IsZero() {
+					rp[i].IsConsort = true
+				}
+			}
+		}
 
 		for _, modifier := range c.Modifier {
 			if m, ok := modifiers[getModifierVid(modifier.Modifier)]; ok {
@@ -319,4 +338,81 @@ func processPeopleTrait(p *People, t *Trait) {
 	p.ModifiedFertility += t.FertilityPenalty
 	p.ModifiedSexAppeal += t.SexAppealOpinion
 	p.ModifiedCombatRating += t.CombatRating
+}
+
+func getMyCulture(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty) string {
+	if me.Culture != "" {
+		return me.Culture
+	}
+
+	if me.Father != 0 {
+		if father, ok := characterMap[me.Father]; ok {
+			if father.Culture != "" {
+				return father.Culture
+			} else {
+				if father.IsHistory {
+					if history, ok := historyPeople[father.ID]; ok {
+						if history.Culture != "" {
+							return history.Culture
+						}
+					}
+				}
+
+				culture := getMyCulture(father, characterMap, historyPeople, nil)
+
+				if culture != "" {
+					return culture
+				}
+			}
+		}
+	}
+
+	if me.Dynasty != 0 {
+		if dynasty, ok := dynasties[me.Dynasty]; ok {
+			if dynasty.Culture != "" {
+				return dynasty.Culture
+			}
+		}
+
+	}
+
+	return ""
+}
+
+func getMyReligion(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty) string {
+	if me.Religion != "" {
+		return me.Religion
+	}
+
+	if me.Father != 0 {
+		if father, ok := characterMap[me.Father]; ok {
+			if father.Culture != "" {
+				return father.Religion
+			} else {
+				if father.IsHistory {
+					if history, ok := historyPeople[father.ID]; ok {
+						if history.Religion != "" {
+							return history.Religion
+						}
+					}
+				}
+
+				religion := getMyReligion(father, characterMap, historyPeople, nil)
+
+				if religion != "" {
+					return religion
+				}
+			}
+		}
+	}
+
+	if me.Dynasty != 0 {
+		if dynasty, ok := dynasties[me.Dynasty]; ok {
+			if dynasty.Religion != "" {
+				return dynasty.Religion
+			}
+		}
+	}
+
+	return ""
 }

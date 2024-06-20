@@ -4,7 +4,7 @@ import (
 	"github.com/thalesfu/paradoxtools/CK2/save"
 )
 
-func GenerateDynasties(dynasties map[int]*save.Dynasty, cm map[string]string, rm map[string]string) (
+func GenerateDynasties(dynasties map[int]*save.Dynasty) (
 	[]*Dynasty,
 	[]*Dynasty_Culture,
 	[]*Dynasty_Religion) {

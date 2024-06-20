@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/nebulagolang/utils"
-	"github.com/thalesfu/paradoxtools/CK2/culture"
 	"github.com/thalesfu/paradoxtools/CK2/localisation"
-	"github.com/thalesfu/paradoxtools/CK2/religion"
 	"github.com/thalesfu/paradoxtools/CK2/save"
 	"log"
 	"reflect"
@@ -108,7 +106,7 @@ type StoryUpdateDetail struct {
 	Story_Player                  *nebulagolang.CompareResult[*Story_Player]
 }
 
-func GetStory(path string, savePath string) *StoryDetail {
+func GetStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) *StoryDetail {
 	log.Println("Get story.")
 
 	s, ok, err := save.LoadSave(path, savePath)
@@ -123,30 +121,12 @@ func GetStory(path string, savePath string) *StoryDetail {
 		return nil
 	}
 
-	cgs := culture.LoadAllCultures(path)
-	cm := make(map[string]string)
-	rm := make(map[string]string)
-
-	for _, cg := range cgs {
-		for _, c := range cg.Cultures {
-			cm[c.Code] = c.Name
-		}
-	}
-
-	rgs := religion.LoadAllReligions(path)
-
-	for _, rg := range rgs {
-		for _, r := range rg.Religions {
-			rm[r.Code] = r.Name
-		}
-	}
-
-	detail := GenerateStoryDetails(s, cm, rm, translations)
+	detail := GenerateStoryDetails(s, cultureMap, religionMap, translations, historyPeople)
 
 	return detail
 }
 
-func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[string]string, translations map[string]string) *StoryDetail {
+func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, translations map[string]string, historyPeople map[int]*People) *StoryDetail {
 
 	titles,
 		baseTitles,
@@ -156,9 +136,9 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		title_dynasties,
 		title_people := GenerateTitles(file.Titles)
 
-	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cm, rm)
+	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cultureMap, religionMap)
 
-	dynasties, dynasty_cultures, dynasty_religions := GenerateDynasties(file.Dynasties, cm, rm)
+	dynasties, dynasty_cultures, dynasty_religions := GenerateDynasties(file.Dynasties)
 
 	people,
 		people_cultures,
@@ -176,7 +156,7 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		people_lovers,
 		people_guardians,
 		people_ambtions,
-		people_focuses := GeneratePeople(file, cm, rm)
+		people_focuses := GeneratePeople(file, cultureMap, religionMap, historyPeople)
 
 	people_relations := GenerateRelations(file, translations)
 
@@ -226,8 +206,12 @@ func GenerateStoryDetails(file *save.SaveFile, cm map[string]string, rm map[stri
 		People_Focuses:                people_focuses,
 	}
 
-	sd.Story.CultureName = cm[sd.Story.Culture]
-	sd.Story.ReligionName = rm[sd.Story.Religion]
+	if c, ok := cultureMap[sd.Story.Culture]; ok {
+		sd.Story.CultureName = c.Name
+	}
+	if r, ok := religionMap[sd.Story.Religion]; ok {
+		sd.Story.ReligionName = r.Name
+	}
 
 	sd.Story_Player = append(sd.Story_Player, NewStory_Player(sd.Story, NewPeople(sd.Story.StoryId, sd.Story.PlayerID)))
 
@@ -292,8 +276,8 @@ type CUResult struct {
 	StartTime     time.Time
 }
 
-func LoadAndUpdateStory(path string, savePath string) (*StoryUpdateDetail, *nebulagolang.Result) {
-	s := GetStory(path, savePath)
+func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) (*StoryUpdateDetail, *nebulagolang.Result) {
+	s := GetStory(path, savePath, cultureMap, religionMap, historyPeople)
 
 	if s == nil {
 		return nil, nil
@@ -421,8 +405,8 @@ func UpdateStoryCompareAndUpdateDetail(detail map[reflect.Type]reflect.Value, re
 	return result.UpdateResult, true
 }
 
-func BuildStory(path string, savePath string) {
-	story, result := LoadAndUpdateStory(path, savePath)
+func BuildStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People) {
+	story, result := LoadAndUpdateStory(path, savePath, cultureMap, religionMap, historyPeople)
 
 	if !result.Ok {
 		fmt.Println(result.Err)

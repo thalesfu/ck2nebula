@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GenerateProvinces(provinces map[int]*save.Province, cm map[string]string, rm map[string]string) (
+func GenerateProvinces(provinces map[int]*save.Province, cultureMap map[string]*Culture, religionMap map[string]*Religion) (
 	[]*Province,
 	[]*Province_Modifier,
 	[]*Province_Culture,
@@ -28,8 +28,12 @@ func GenerateProvinces(provinces map[int]*save.Province, cm map[string]string, r
 	i := 0
 	for _, province := range provinces {
 		rps[i] = NewProvinceByData(province)
-		rps[i].ReligionName = rm[rps[i].Religion]
-		rps[i].CultureName = cm[rps[i].Culture]
+		if r, ok := religionMap[rps[i].Religion]; ok {
+			rps[i].ReligionName = r.Name
+		}
+		if c, ok := cultureMap[rps[i].Culture]; ok {
+			rps[i].CultureName = c.Name
+		}
 
 		if rps[i].Culture != "" {
 			rpcs = append(rpcs, NewProvince_Culture(rps[i], NewCulture(rps[i].Culture)))

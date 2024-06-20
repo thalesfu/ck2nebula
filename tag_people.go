@@ -60,6 +60,9 @@ type People struct {
 	Score                float32   `nebulaproperty:"score" description:"score" nebulaindexes:"score" json:"score,omitempty"`
 	Society              int       `nebulaproperty:"society" description:"society" nebulaindexes:"society" json:"society,omitempty"`
 	StoryID              int       `nebulaproperty:"story_id" mappingalias:"PlayID" description:"game play id" nebulaindexes:"story_id" json:"story_id,omitempty"`
+	Married              bool      `nebulaproperty:"married" description:"has married" nebulaindexes:"married" json:"has_married,omitempty"`
+	ConsortCount         int       `nebulaproperty:"consort_count" description:"consort count" nebulaindexes:"consort_count" json:"consort_count,omitempty"`
+	IsConsort            bool      `nebulaproperty:"is_consort" description:"is consort" nebulaindexes:"is_consort" json:"is_consort,omitempty"`
 }
 
 func NewPeople(storyId int, peopleId int) *People {
