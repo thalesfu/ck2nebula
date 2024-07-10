@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) ([]*People, []*People_Culture, []*People_GFXCulture, []*People_Religion, []*People_SecretReligion, []*People_Trait, []*People_Modifier, []*People_ClaimTitle, []*People_Dynasty, []*People_FamilyPeople, []*People_HostPeople, []*People_EmpirePeople, []*People_KillPeople, []*People_LoverPeople, []*People_GuardianPeople, []*People_Ambition, []*People_Focus) {
+func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]map[int]*People, historyDynasty map[int]*Dynasty, supremeRuler map[int]int, rulerChain map[int]map[int]bool) ([]*People, []*People_Culture, []*People_GFXCulture, []*People_Religion, []*People_SecretReligion, []*People_Trait, []*People_Modifier, []*People_ClaimTitle, []*People_Dynasty, []*People_FamilyPeople, []*People_HostPeople, []*People_EmpirePeople, []*People_KillPeople, []*People_LoverPeople, []*People_GuardianPeople, []*People_Ambition, []*People_Focus) {
 	rp := make([]*People, len(file.Characters))
 	rpcs := make([]*People_Culture, 0)
 	rpgcs := make([]*People_GFXCulture, 0)
@@ -32,6 +32,9 @@ func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religio
 	i := 0
 	for _, c := range file.Characters {
 		rp[i] = NewPeopleByData(c)
+		if d, ok := file.Dynasties[c.Dynasty]; ok {
+			rp[i].DynastyName = d.Name
+		}
 
 		rp[i].Culture = getMyCulture(c, file.Characters, historyPeople, file.Dynasties, historyDynasty)
 		rp[i].Religion = getMyReligion(c, file.Characters, historyPeople, file.Dynasties, historyDynasty)
@@ -47,6 +50,16 @@ func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religio
 		}
 		if gcul, ok := cultureMap[rp[i].GFXCulture]; ok {
 			rp[i].GFXCultureName = gcul.Name
+		}
+
+		rp[i].Father, rp[i].Mother, rp[i].GrandFather, rp[i].GrandMother, rp[i].MaternalGrandFather, rp[i].MaternalGrandMother = getParents(c, file.Characters)
+
+		if sr, ok := supremeRuler[c.Emp]; ok {
+			rp[i].SupreMeRuler = sr
+		}
+
+		if rc, ok := rulerChain[c.Emp]; ok {
+			rp[i].IsUnderMyRule = rc[file.Player.ID]
 		}
 
 		for _, spouse := range c.Spouse {
@@ -273,6 +286,26 @@ func GeneratePeople(file *save.SaveFile, cultureMap map[string]*Culture, religio
 	return rp, rpcs, rpgcs, rprs, rpsrs, rpts, rpms, rpcts, rpds, rpfps, rphps, rpeps, rpkps, rplps, rpgps, rpas, rpfs
 }
 
+func getParents(c *save.Character, characters map[int]*save.Character) (int, int, int, int, int, int) {
+	var grandFather, grandMother, maternalGrandFather, maternalGrandMother int
+
+	if c.Father != 0 {
+		if f, ok := characters[c.Father]; ok {
+			grandFather = f.Father
+			grandMother = f.Mother
+		}
+	}
+
+	if c.Mother != 0 {
+		if m, ok := characters[c.Mother]; ok {
+			maternalGrandFather = m.Father
+			maternalGrandMother = m.Mother
+		}
+	}
+
+	return c.Father, c.Mother, grandFather, grandMother, maternalGrandFather, maternalGrandMother
+}
+
 func processPeopleObject(p *People, o *Objective) {
 	p.ModifiedDiplomacy += o.Diplomacy
 	p.ModifiedMartial += o.Martial
@@ -323,7 +356,7 @@ func processPeopleTrait(p *People, t *Trait) {
 	p.ModifiedCombatRating += t.CombatRating
 }
 
-func getMyCulture(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
+func getMyCulture(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
 	if me.Culture != "" {
 		return me.Culture
 	}
@@ -334,7 +367,7 @@ func getMyCulture(me *save.Character, characterMap map[int]*save.Character, hist
 				return father.Culture
 			} else {
 				if father.IsHistory {
-					if history, ok := historyPeople[father.ID]; ok {
+					if history, ok := getHistoryPeople(father.ID, historyPeople); ok {
 						if history.Culture != "" {
 							return history.Culture
 						}
@@ -367,7 +400,7 @@ func getMyCulture(me *save.Character, characterMap map[int]*save.Character, hist
 	return ""
 }
 
-func getMyReligion(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
+func getMyReligion(me *save.Character, characterMap map[int]*save.Character, historyPeople map[int]map[int]*People, dynasties map[int]*save.Dynasty, historyDynasty map[int]*Dynasty) string {
 	if me.Religion != "" {
 		return me.Religion
 	}
@@ -378,7 +411,7 @@ func getMyReligion(me *save.Character, characterMap map[int]*save.Character, his
 				return father.Religion
 			} else {
 				if father.IsHistory {
-					if history, ok := historyPeople[father.ID]; ok {
+					if history, ok := getHistoryPeople(father.ID, historyPeople); ok {
 						if history.Religion != "" {
 							return history.Religion
 						}
@@ -409,4 +442,17 @@ func getMyReligion(me *save.Character, characterMap map[int]*save.Character, his
 	}
 
 	return ""
+}
+
+func getHistoryPeople(peopleId int, historyPeople map[int]map[int]*People) (*People, bool) {
+	key := peopleId % 10000
+	if _, ok := historyPeople[key]; !ok {
+		return nil, false
+	}
+
+	if p, ok := historyPeople[key][peopleId]; ok {
+		return p, true
+	}
+
+	return nil, false
 }

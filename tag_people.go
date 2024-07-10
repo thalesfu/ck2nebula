@@ -63,6 +63,14 @@ type People struct {
 	Married              bool      `nebulaproperty:"married" description:"has married" nebulaindexes:"married" json:"has_married,omitempty"`
 	ConsortCount         int       `nebulaproperty:"consort_count" description:"consort count" nebulaindexes:"consort_count" json:"consort_count,omitempty"`
 	IsConsort            bool      `nebulaproperty:"is_consort" description:"is consort" nebulaindexes:"is_consort" json:"is_consort,omitempty"`
+	Father               int       `nebulaproperty:"father" description:"father" nebulaindexes:"father" json:"father,omitempty"`
+	Mother               int       `nebulaproperty:"mother" description:"mother" nebulaindexes:"mother" json:"mother,omitempty"`
+	GrandFather          int       `nebulaproperty:"grandfather" description:"grandfather" nebulaindexes:"grandfather" json:"grandfather,omitempty"`
+	GrandMother          int       `nebulaproperty:"grandmother" description:"grandmother" nebulaindexes:"grandmother" json:"grandmother,omitempty"`
+	MaternalGrandFather  int       `nebulaproperty:"maternal_grandfather" description:"maternal_grandfather" nebulaindexes:"maternal_grandfather" json:"maternal_grandfather,omitempty"`
+	MaternalGrandMother  int       `nebulaproperty:"maternal_grandmother" description:"maternal_grandmother" nebulaindexes:"maternal_grandmother" json:"maternal_grandmother,omitempty"`
+	IsUnderMyRule        bool      `nebulaproperty:"is_under_my_rule" description:"is under my rule" nebulaindexes:"is_under_my_rule" json:"is_under_my_rule,omitempty"`
+	SupreMeRuler         int       `nebulaproperty:"supreme_ruler" description:"supreme ruler" nebulaindexes:"supreme_ruler" json:"supreme_ruler,omitempty"`
 }
 
 func NewPeople(storyId int, peopleId int) *People {
@@ -375,6 +383,24 @@ func (p *People) GetVassals(space *nebulagolang.Space) *nebulagolang.ResultT[map
 	}
 
 	return p.getPeopleByQuery(space, nebulagolang.CommandPipelineCombine(commands...))
+}
+
+func GetSinglePeople(space *nebulagolang.Space, storyId int) *nebulagolang.ResultT[map[int]*People] {
+	command := fmt.Sprintf("lookup on people where people.isdead==false and people.is_under_my_rule==true and people.age>20 and people.age<40 and people.married==false and people.gov!=\"theocracy_government\" and people.story_id==%d yield vertex as v\n", storyId)
+
+	r := nebulagolang.QueryVertexesByQueryToSlice[*People](space, command)
+
+	if !r.Ok {
+		return nebulagolang.NewResultT[map[int]*People](r.Result)
+	}
+
+	result := make(map[int]*People)
+
+	for _, f := range r.Data {
+		result[f.ID] = f
+	}
+
+	return nebulagolang.NewResultTWithData(r.Result, result)
 }
 
 func (p *People) GetEmpirePeople(space *nebulagolang.Space) *nebulagolang.ResultT[map[int]*People] {

@@ -11,7 +11,9 @@ func GenerateTitles(titles map[string]*save.Title) (
 	[]*Title_DejureLiegeTitle,
 	[]*Title_AssimilatingLiegeTitle,
 	[]*Title_Dynasty,
-	[]*Title_People) {
+	[]*Title_People,
+	map[int]int,
+	map[int]map[int]bool) {
 	rts := make([]*Title, len(titles))
 	rtlts := make([]*Title_LiegeTitle, 0)
 	rtbts := make([]*Title_BaseTitle, 0)
@@ -19,6 +21,8 @@ func GenerateTitles(titles map[string]*save.Title) (
 	rtalts := make([]*Title_AssimilatingLiegeTitle, 0)
 	rtds := make([]*Title_Dynasty, 0)
 	rtp := make([]*Title_People, 0)
+	supremeRuler := make(map[int]int)
+	rulerChain := make(map[int]map[int]bool)
 
 	i := 0
 	for _, title := range titles {
@@ -67,8 +71,36 @@ func GenerateTitles(titles map[string]*save.Title) (
 			rtp = append(rtp, tpe)
 		}
 
+		supremeRuler[title.Holder], rulerChain[title.Holder] = getSupremeRuler(title, titles, nil)
+
 		i++
 	}
 
-	return rts, rtbts, rtlts, rtdlts, rtalts, rtds, rtp
+	return rts, rtbts, rtlts, rtdlts, rtalts, rtds, rtp, supremeRuler, rulerChain
+}
+
+func getSupremeRuler(title *save.Title, titles map[string]*save.Title, rulerChain map[int]bool) (int, map[int]bool) {
+	if rulerChain == nil {
+		rulerChain = make(map[int]bool)
+	}
+
+	rulerChain[title.Holder] = true
+
+	if title.Liege == nil {
+		return title.Holder, rulerChain
+	}
+
+	if title.Liege.ID == "" {
+		return title.Holder, rulerChain
+	}
+
+	if title.Liege.ID == title.ID {
+		return title.Holder, rulerChain
+	}
+
+	if l, ok := titles[title.Liege.ID]; ok {
+		return getSupremeRuler(l, titles, rulerChain)
+	}
+
+	return title.Holder, rulerChain
 }

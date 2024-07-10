@@ -106,7 +106,7 @@ type StoryUpdateDetail struct {
 	Story_Player                  *nebulagolang.CompareResult[*Story_Player]
 }
 
-func GetStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
+func GetStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
 	log.Println("Get story.")
 
 	s, ok, err := save.LoadSave(path, savePath)
@@ -126,7 +126,7 @@ func GetStory(path string, savePath string, cultureMap map[string]*Culture, reli
 	return detail
 }
 
-func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, translations map[string]string, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
+func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, religionMap map[string]*Religion, translations map[string]string, historyPeople map[int]map[int]*People, historyDynasty map[int]*Dynasty) *StoryDetail {
 
 	titles,
 		baseTitles,
@@ -134,7 +134,9 @@ func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, r
 		dejureLiegeTitles,
 		assimilatingLiegeTitles,
 		title_dynasties,
-		title_people := GenerateTitles(file.Titles)
+		title_people,
+		titleSupremeRuler,
+		titleRulerChain := GenerateTitles(file.Titles)
 
 	provinces, province_modifiers, province_cultures, province_religions, province_titles, barons, province_barons, baron_buildings, baron_titles := GenerateProvinces(file.Provinces, cultureMap, religionMap)
 
@@ -156,7 +158,7 @@ func GenerateStoryDetails(file *save.SaveFile, cultureMap map[string]*Culture, r
 		people_lovers,
 		people_guardians,
 		people_ambtions,
-		people_focuses := GeneratePeople(file, cultureMap, religionMap, historyPeople, historyDynasty)
+		people_focuses := GeneratePeople(file, cultureMap, religionMap, historyPeople, historyDynasty, titleSupremeRuler, titleRulerChain)
 
 	people_relations := GenerateRelations(file, translations)
 
@@ -276,7 +278,7 @@ type CUResult struct {
 	StartTime     time.Time
 }
 
-func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) (*StoryUpdateDetail, *nebulagolang.Result) {
+func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]map[int]*People, historyDynasty map[int]*Dynasty) (*StoryUpdateDetail, *nebulagolang.Result) {
 	s := GetStory(path, savePath, cultureMap, religionMap, historyPeople, historyDynasty)
 
 	if s == nil {
@@ -405,7 +407,7 @@ func UpdateStoryCompareAndUpdateDetail(detail map[reflect.Type]reflect.Value, re
 	return result.UpdateResult, true
 }
 
-func BuildStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]*People, historyDynasty map[int]*Dynasty) {
+func BuildStory(path string, savePath string, cultureMap map[string]*Culture, religionMap map[string]*Religion, historyPeople map[int]map[int]*People, historyDynasty map[int]*Dynasty) {
 	story, result := LoadAndUpdateStory(path, savePath, cultureMap, religionMap, historyPeople, historyDynasty)
 
 	if !result.Ok {
