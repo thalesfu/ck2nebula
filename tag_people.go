@@ -386,7 +386,7 @@ func (p *People) GetVassals(space *nebulagolang.Space) *nebulagolang.ResultT[map
 }
 
 func GetSinglePeople(space *nebulagolang.Space, storyId int) *nebulagolang.ResultT[map[int]*People] {
-	command := fmt.Sprintf("lookup on people where people.isdead==false and people.is_under_my_rule==true and people.age>20 and people.age<40 and people.married==false and people.gov!=\"theocracy_government\" and people.story_id==%d yield vertex as v\n", storyId)
+	command := fmt.Sprintf("lookup on people where people.isdead==false and people.is_under_my_rule==true and people.age>20 and people.age<60 and people.married==false and people.gov!=\"theocracy_government\" and people.story_id==%d yield vertex as v\n", storyId)
 
 	r := nebulagolang.QueryVertexesByQueryToSlice[*People](space, command)
 
