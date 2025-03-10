@@ -2,8 +2,8 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
-	"github.com/thalesfu/nebulagolang/utils"
 	"github.com/thalesfu/paradoxtools/CK2/localisation"
 	"github.com/thalesfu/paradoxtools/CK2/save"
 	"log"
@@ -361,7 +361,7 @@ func LoadAndUpdateStory(path string, savePath string, cultureMap map[string]*Cul
 }
 
 func CRData[T interface{}](chanel chan<- *CUResult, sem chan struct{}, data []T, query string, fields map[string]bool) {
-	t := utils.GetType[T]()
+	t := golangutils.GetType[T]()
 	fields[t.Name()] = true
 	sem <- struct{}{}
 	go func() {
@@ -372,7 +372,7 @@ func CRData[T interface{}](chanel chan<- *CUResult, sem chan struct{}, data []T,
 		r.UpdateResult = usr
 		r.CompareResult = csr
 		diff := time.Now().Sub(r.StartTime)
-		log.Printf("%sCompare and update %s done. Take %.0f seconds.%s\n", utils.PrintColorYellow, r.Name, diff.Seconds(), utils.PrintColorReset)
+		log.Printf("%sCompare and update %s done. Take %.0f seconds.%s\n", golangutils.PrintColorYellow, r.Name, diff.Seconds(), golangutils.PrintColorReset)
 		chanel <- r
 	}()
 }
@@ -380,7 +380,7 @@ func CRData[T interface{}](chanel chan<- *CUResult, sem chan struct{}, data []T,
 func GetStoryCompareAndUpdateDetailGenericFieldReflectValue(detail *StoryUpdateDetail) map[reflect.Type]reflect.Value {
 	result := make(map[reflect.Type]reflect.Value)
 
-	fv := utils.IndirectValue(reflect.ValueOf(detail))
+	fv := golangutils.IndirectValue(reflect.ValueOf(detail))
 	ft := fv.Type()
 
 	for i := 0; i < ft.NumField(); i++ {
@@ -461,26 +461,26 @@ func BuildStory(path string, savePath string, cultureMap map[string]*Culture, re
 }
 
 func printCompareAndUpdatedResult[T interface{}](result *nebulagolang.CompareResult[T]) {
-	name := utils.GetType[T]().Name()
+	name := golangutils.GetType[T]().Name()
 	if result == nil {
-		fmt.Printf("%sNo data for %s%s\n", utils.PrintColorRed, name, utils.PrintColorReset)
+		fmt.Printf("%sNo data for %s%s\n", golangutils.PrintColorRed, name, golangutils.PrintColorReset)
 		return
 	}
 
 	if len(result.Added) > 0 {
-		fmt.Printf("%s%s added: %d%s\n", utils.PrintColorGreen, name, result.AddedCount, utils.PrintColorReset)
+		fmt.Printf("%s%s added: %d%s\n", golangutils.PrintColorGreen, name, result.AddedCount, golangutils.PrintColorReset)
 	}
 
 	if len(result.Updated) > 0 {
-		fmt.Printf("%s%s updated: %d%s\n", utils.PrintColorYellow, name, result.UpdatedCount, utils.PrintColorReset)
+		fmt.Printf("%s%s updated: %d%s\n", golangutils.PrintColorYellow, name, result.UpdatedCount, golangutils.PrintColorReset)
 	}
 
 	if len(result.Deleted) > 0 {
-		fmt.Printf("%s%s deleted: %d%s\n", utils.PrintColorRed, name, result.DeletedCount, utils.PrintColorReset)
+		fmt.Printf("%s%s deleted: %d%s\n", golangutils.PrintColorRed, name, result.DeletedCount, golangutils.PrintColorReset)
 	}
 
 	if len(result.Kept) > 0 {
-		fmt.Printf("%s%s kept: %d%s\n", utils.PrintColorWhite, name, result.DeletedCount, utils.PrintColorReset)
+		fmt.Printf("%s%s kept: %d%s\n", golangutils.PrintColorWhite, name, result.DeletedCount, golangutils.PrintColorReset)
 	}
 }
 
