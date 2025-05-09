@@ -2,9 +2,9 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 	"time"
 )
 
@@ -29,7 +29,7 @@ func NewBaron(storyId int, code string) *Baron {
 }
 
 func NewBaronByData(baron *save.Baron) *Baron {
-	nebulaBaron := utils.Mapping[Baron](baron)
+	nebulaBaron := golangutils.Mapping[Baron](baron)
 	nebulaBaron.VID = getBaronVid(nebulaBaron.StoryID, nebulaBaron.Code)
 	return &nebulaBaron
 }

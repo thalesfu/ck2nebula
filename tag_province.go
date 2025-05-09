@@ -2,9 +2,9 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Province struct {
@@ -50,7 +50,7 @@ func NewProvince(storyId int, provinceId int) *Province {
 }
 
 func NewProvinceByData(province *save.Province) *Province {
-	nebulaProvince := utils.Mapping[Province](province)
+	nebulaProvince := golangutils.Mapping[Province](province)
 	nebulaProvince.VID = getProvinceVid(nebulaProvince.StoryID, nebulaProvince.ID)
 
 	if province.Technology != nil && len(province.Technology.TechLevels) > 0 {

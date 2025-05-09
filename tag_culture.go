@@ -1,9 +1,9 @@
 package ck2nebula
 
 import (
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/culture"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Culture struct {
@@ -32,7 +32,7 @@ func NewCulture(code string) *Culture {
 }
 
 func NewCultureByData(culture *culture.Culture) *Culture {
-	nebulaCulture := utils.Mapping[Culture](culture)
+	nebulaCulture := golangutils.Mapping[Culture](culture)
 	nebulaCulture.VID = getCultureVid(nebulaCulture.Code)
 	return &nebulaCulture
 }

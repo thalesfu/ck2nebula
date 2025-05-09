@@ -2,10 +2,10 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/flags"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 	"time"
 )
 
@@ -83,7 +83,7 @@ func NewPeople(storyId int, peopleId int) *People {
 }
 
 func NewPeopleByData(character *save.Character) *People {
-	nebulaPeople := utils.Mapping[People](character)
+	nebulaPeople := golangutils.Mapping[People](character)
 	nebulaPeople.VID = getPeopleVid(nebulaPeople.StoryID, nebulaPeople.ID)
 	if len(character.Attributes) > 0 {
 		for i, attr := range character.Attributes {

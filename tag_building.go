@@ -1,9 +1,9 @@
 package ck2nebula
 
 import (
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/building"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Building struct {
@@ -120,7 +120,7 @@ func NewBuilding(code string) *Building {
 }
 
 func NewBuildingByData(building *building.Building) *Building {
-	nebulaBuilding := utils.Mapping[Building](building)
+	nebulaBuilding := golangutils.Mapping[Building](building)
 	nebulaBuilding.VID = getBuildingVid(nebulaBuilding.Code)
 	return &nebulaBuilding
 }

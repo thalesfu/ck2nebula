@@ -2,9 +2,9 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/trait"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Trait struct {
@@ -150,7 +150,7 @@ func NewTrait(id int) *Trait {
 }
 
 func NewTraitByData(trait *trait.Trait) *Trait {
-	nebulaTrait := utils.Mapping[Trait](trait)
+	nebulaTrait := golangutils.Mapping[Trait](trait)
 	nebulaTrait.VID = getTraitVid(nebulaTrait.ID)
 	return &nebulaTrait
 }

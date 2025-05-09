@@ -2,9 +2,9 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Dynasty struct {
@@ -28,7 +28,7 @@ func NewDynasty(storyId int, dynastyId int) *Dynasty {
 }
 
 func NewDynastyByData(dynasty *save.Dynasty) *Dynasty {
-	nebulaDynasty := utils.Mapping[Dynasty](dynasty)
+	nebulaDynasty := golangutils.Mapping[Dynasty](dynasty)
 	nebulaDynasty.VID = getDynastyVid(nebulaDynasty.StoryID, nebulaDynasty.ID)
 
 	if dynasty.CoatOfArms != nil {

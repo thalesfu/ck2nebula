@@ -2,9 +2,9 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Title struct {
@@ -40,7 +40,7 @@ func NewTitle(storyId int, titleId string) *Title {
 }
 
 func NewTitleByData(title *save.Title) *Title {
-	nebulaTitle := utils.Mapping[Title](title)
+	nebulaTitle := golangutils.Mapping[Title](title)
 	nebulaTitle.VID = getTitleVid(nebulaTitle.StoryID, nebulaTitle.ID)
 
 	if title.CoatOfArms != nil {

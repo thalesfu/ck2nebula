@@ -1,9 +1,9 @@
 package ck2nebula
 
 import (
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/modifier"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Modifier struct {
@@ -124,7 +124,7 @@ func NewModifier(code string) *Modifier {
 }
 
 func NewModifierByData(modifier *modifier.Modifier) *Modifier {
-	nebulaModifier := utils.Mapping[Modifier](modifier)
+	nebulaModifier := golangutils.Mapping[Modifier](modifier)
 	nebulaModifier.VID = getModifierVid(nebulaModifier.Code)
 	return &nebulaModifier
 }

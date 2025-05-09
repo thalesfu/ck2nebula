@@ -2,8 +2,8 @@ package ck2nebula
 
 import (
 	"fmt"
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/paradoxtools/CK2/save"
-	"github.com/thalesfu/paradoxtools/utils"
 	"reflect"
 	"strconv"
 	"strings"
@@ -75,7 +75,7 @@ func generateRelations(src *save.Character, dst *save.Character, rels []*save.Pe
 
 	for _, rel := range rels {
 
-		relv := utils.IndirectValue(reflect.ValueOf(rel))
+		relv := golangutils.IndirectValue(reflect.ValueOf(rel))
 		relt := relv.Type()
 
 		if rel.RY != 0 {
@@ -138,33 +138,33 @@ func generateRelations(src *save.Character, dst *save.Character, rels []*save.Pe
 		for i := 0; i < relt.NumField(); i++ {
 			ft := relt.Field(i)
 			fv := relv.Field(i)
-			ftn := utils.IndirectValue(reflect.New(ft.Type)).Type().Name()
+			ftn := golangutils.IndirectValue(reflect.New(ft.Type)).Type().Name()
 			var relation *People_RelatePeople
 
 			switch ftn {
 			case "CommonRelation":
 				if !fv.IsNil() {
-					cr := utils.IndirectValue(fv).Interface().(save.CommonRelation)
+					cr := golangutils.IndirectValue(fv).Interface().(save.CommonRelation)
 					relation = generateCommonRelation(src, dst, &cr, ft.Tag.Get("paradox_field"), translations)
 				}
 			case "CasusBelli":
 				if !fv.IsNil() {
-					cb := utils.IndirectValue(fv).Interface().(save.CasusBelli)
+					cb := golangutils.IndirectValue(fv).Interface().(save.CasusBelli)
 					relation = generateCasusBelliRelation(src, dst, &cb, ft.Tag.Get("paradox_field"), file)
 				}
 			case "Truce":
 				if !fv.IsNil() {
-					t := utils.IndirectValue(fv).Interface().(save.Truce)
+					t := golangutils.IndirectValue(fv).Interface().(save.Truce)
 					relation = generateTruceRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
 				}
 			case "Tributary":
 				if !fv.IsNil() {
-					t := utils.IndirectValue(fv).Interface().(save.Tributary)
+					t := golangutils.IndirectValue(fv).Interface().(save.Tributary)
 					relation = generateTributaryRelation(src, dst, &t, ft.Tag.Get("paradox_field"), file)
 				}
 			case "MarriageTie":
 				if !fv.IsNil() {
-					mt := utils.IndirectValue(fv).Interface().(save.MarriageTie)
+					mt := golangutils.IndirectValue(fv).Interface().(save.MarriageTie)
 					relation = generateMarriageTieRelation(src, dst, &mt, ft.Tag.Get("paradox_field"), file)
 				}
 			}

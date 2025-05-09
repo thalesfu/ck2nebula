@@ -1,9 +1,9 @@
 package ck2nebula
 
 import (
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/religion"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type ReligionGroup struct {
@@ -21,7 +21,7 @@ func NewReligionGroup(code string) *ReligionGroup {
 }
 
 func NewReligionGroupByData(group *religion.ReligionGroup) *ReligionGroup {
-	nebulaReligionGroup := utils.Mapping[ReligionGroup](group)
+	nebulaReligionGroup := golangutils.Mapping[ReligionGroup](group)
 	nebulaReligionGroup.VID = getReligionGroupVid(nebulaReligionGroup.Code)
 	return &nebulaReligionGroup
 }

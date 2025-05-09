@@ -1,9 +1,9 @@
 package ck2nebula
 
 import (
+	"github.com/thalesfu/golangutils"
 	"github.com/thalesfu/nebulagolang"
 	"github.com/thalesfu/paradoxtools/CK2/objectives"
-	"github.com/thalesfu/paradoxtools/utils"
 )
 
 type Objective struct {
@@ -50,7 +50,7 @@ func NewObjective(code string) *Objective {
 }
 
 func NewObjectiveByData(objective *objectives.Objective) *Objective {
-	nebulaObjective := utils.Mapping[Objective](objective)
+	nebulaObjective := golangutils.Mapping[Objective](objective)
 	nebulaObjective.VID = getObjectiveVid(nebulaObjective.Code)
 	return &nebulaObjective
 }
