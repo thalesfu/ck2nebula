@@ -2,6 +2,8 @@ package ck2nebula
 
 import (
 	"github.com/thalesfu/paradoxtools/CK2/save"
+	"sort"
+	"strings"
 )
 
 func GenerateTitles(titles map[string]*save.Title) (
@@ -24,8 +26,20 @@ func GenerateTitles(titles map[string]*save.Title) (
 	supremeRuler := make(map[int]int)
 	rulerChain := make(map[int]map[int]bool)
 
+	// Sort title IDs by level (barony→county→duchy→kingdom→empire) so that
+	// higher-level titles are processed last and win the supremeRuler overwrite.
+	// This prevents map-iteration non-determinism from causing per-run oscillation.
+	keys := make([]string, 0, len(titles))
+	for k := range titles {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(a, b int) bool {
+		return titleLevelSort(keys[a]) < titleLevelSort(keys[b])
+	})
+
 	i := 0
-	for _, title := range titles {
+	for _, k := range keys {
+		title := titles[k]
 		rts[i] = NewTitleByData(title)
 
 		if title.Liege != nil {
@@ -103,4 +117,22 @@ func getSupremeRuler(title *save.Title, titles map[string]*save.Title, rulerChai
 	}
 
 	return title.Holder, rulerChain
+}
+
+// titleLevelSort returns a sort key so that lower-level titles sort before higher ones.
+// Processing order: b_ < c_ < d_ < k_ < e_, so empire titles are processed last
+// and their supremeRuler determination wins over lower-level titles for the same holder.
+func titleLevelSort(id string) int {
+	switch {
+	case strings.HasPrefix(id, "e_"):
+		return 4
+	case strings.HasPrefix(id, "k_"):
+		return 3
+	case strings.HasPrefix(id, "d_"):
+		return 2
+	case strings.HasPrefix(id, "c_"):
+		return 1
+	default:
+		return 0
+	}
 }
